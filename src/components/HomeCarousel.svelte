@@ -21,6 +21,7 @@
 
 <Carousel loop={false} perPage={windowWidth}>
   <!-- {#each materials as material} -->
-    <SingleCard {material} />
+    <!-- <SingleCard {material} /> -->
   <!-- {/each} -->
+  <SingleCard material={materials[0]} />
 </Carousel>
