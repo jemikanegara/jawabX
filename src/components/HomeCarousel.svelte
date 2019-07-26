@@ -19,9 +19,8 @@
   ];
 </script>
 
-<Carousel loop={false} perPage={windowWidth}>
+<Carousel loop={false}>
   {#each materials as material}
     <SingleCard {material} />
   {/each}
-  <!-- <SingleCard material={materials[0]} /> -->
 </Carousel>
