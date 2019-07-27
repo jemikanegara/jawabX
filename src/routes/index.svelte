@@ -17,3 +17,4 @@
     <Carousels {windowWidth} title={type.title} />
   {/each}
 {/if}
+

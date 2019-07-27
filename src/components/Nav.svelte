@@ -9,6 +9,12 @@
       segment: undefined,
       text: "Home",
       prefetch: false
+    },
+    {
+      url: "materi",
+      segment: "materi",
+      text: "Materi",
+      prefetch: false
     }
   ];
 

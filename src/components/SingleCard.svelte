@@ -3,6 +3,7 @@
 </script>
 
 <style lang="scss">
+
   .slide-content {
     display: block;
     padding: 10px;
