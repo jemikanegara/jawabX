@@ -1,20 +1,28 @@
+<script context="module">
+  export function preload() {
+    return this.fetch(`/materials.json`)
+      .then(r => r.json())
+      .then(res => {
+        const materials = res.materials;
+        return { materials };
+      });
+  }
+</script>
+
 <script>
   import Carousels from "../components/Carousels.svelte";
   import { types } from "../stores/type.js";
-  let windowWidth;
+  export let materials;
 </script>
+
 <!-- Set Title -->
 <svelte:head>
   <title>Sapper project template</title>
 </svelte:head>
 
-<!-- Get Window Width -->
-<svelte:window bind:innerWidth={windowWidth} />
-
 <!-- Carousels -->
 {#if $types.length > 0}
   {#each $types as type, index}
-    <Carousels {windowWidth} title={type.title} />
+    <Carousels title={type.title} {materials} />
   {/each}
 {/if}
-

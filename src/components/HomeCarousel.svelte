@@ -1,28 +1,9 @@
 <script>
-  import Carousel from "@beyonk/svelte-carousel";
   import SingleCard from "./SingleCard.svelte";
-  export let windowWidth;
   import Siema from "siema";
   import { onMount } from "svelte";
 
-  const singleMaterials = {
-    title: "Modul Akuntansi Dasar 1: Perusahaan Jasa",
-    author: "JawabX",
-    description: "Akuntansi dasar",
-    tried: 989
-  };
-  const materials = [
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials,
-    singleMaterials
-  ];
+  export let materials;
 
   let newSiema;
   let thisInstance;
@@ -32,10 +13,6 @@
     perPage: 0,
     slideLength: 0
   };
-
-  // let currentSlide = newSiema ? newSiema.currentSlide : 0;
-  // let perPage = newSiema ? newSiema.perPage : 0;
-  // let slides = newSiema ? newSiema.innerElements.length : 0;
 
   const refreshStates = () => {
     const { currentSlide, perPage, innerElements } = newSiema;
@@ -93,9 +70,9 @@
 
 <div class="slider">
   <div class="siema" bind:this={thisInstance}>
-    {#each materials as material}
-      <SingleCard {material} />
-    {/each}
+      {#each materials as material}
+        <SingleCard {material} />
+      {/each}
   </div>
   {#if states.currentSlide !== 0}
     <button class="prev" on:click={() => changeSlide('prev')}>
