@@ -1,0 +1,5 @@
+const answerType = "one-choice"
+const answerType = "multiple-choice"
+const answerType = "journal";
+const answerType = "table"
+const answerType = "words"

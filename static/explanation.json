@@ -2,15 +2,70 @@
     "materi": [
         {
             "description": "Oleh sebagian besar masyarakat, akuntansi dipandang sebagai suatu disiplin yang bersifat sangat teknis, yang hanya bisa dipahami oleh akuntan-akuntan profesional. Padahal, dalam kenyataannya hampir setiap orang mempraktekkan sebagian dari teknik-teknik akuntansi dalam aktivitasnya sehari-hari. Membuat anggaran dapur keluarga, mengecek kebenaran buku tabungan, dan sebagainya, adalah contoh-contoh pemanfaatan teknik-teknik akuntansi.",
-            "type": "explanation"
+            "type": "concept",
+            "practice": [
+                {
+                    "option": {
+                        "1": "kas",
+                        "2": "piutang",
+                        "3": "perlengkapan",
+                        "4": "modal",
+                        "5": "utang"
+                    },
+                    "answer": {
+                        "1": {
+                            "debit": 100000,
+                            "kredit": 0
+                        },
+                        "2": false,
+                        "3": false,
+                        "4": {
+                            "debit": 0,
+                            "kredit": 50000
+                        },
+                        "5": {
+                            "debit": 0,
+                            "kredit": 50000
+                        }
+                    }
+                },
+                {
+                    "option": {
+                        "1": "kas",
+                        "2": "peralatan",
+                        "3": "perlengkapan",
+                        "4": "modal",
+                        "5": "utang"
+                    },
+                    "answer": {
+                        "1": {
+                            "debit": 100000,
+                            "kredit": 0
+                        },
+                        "2": {
+                            "debit": 75000,
+                            "kredit": 0
+                        },
+                        "3": false,
+                        "4": {
+                            "debit": 0,
+                            "kredit": 50000
+                        },
+                        "5": {
+                            "debit": 0,
+                            "kredit": 50000
+                        }
+                    }
+                }
+            ]
         },
         {
             "description": "Akuntansi merupakan suatu disiplin yang mempelajari seni mencatat, mendeskripsikan, dan menginterpretasikan aktivitas-aktivitas ekonomi. Akuntansi, bahkan sudah dipandang sebagai bahasa bisnis. Komunikasi dalam dunia usaha banyak dilakukan dengan menggunakan istilah-istilah akuntansi seperti aktiva, laba, cash flow, dan lain sebagainya. Istilah-istilah tersebut mengacu kepada angka-angka yang dikumpulkan dan diolah melalui sistem informasi yang dikenal dengan nama akuntansi. Oleh karena itu, setiap orang yang akan mengambil keputusan-keputusan yang berkaitan dengan dunia usaha perlu memahami istilah dan konsep-konsep akuntansi dengan baik.",
-            "type": "explanation"
+            "type": "concept"
         },
         {
             "description": "03 Akuntansi merupakan suatu disiplin yang mempelajari seni mencatat, mendeskripsikan, dan menginterpretasikan aktivitas-aktivitas ekonomi. Akuntansi, bahkan sudah dipandang sebagai bahasa bisnis. Komunikasi dalam dunia usaha banyak dilakukan dengan menggunakan istilah-istilah akuntansi seperti aktiva, laba, cash flow, dan lain sebagainya. Istilah-istilah tersebut mengacu kepada angka-angka yang dikumpulkan dan diolah melalui sistem informasi yang dikenal dengan nama akuntansi. Oleh karena itu, setiap orang yang akan mengambil keputusan-keputusan yang berkaitan dengan dunia usaha perlu memahami istilah dan konsep-konsep akuntansi dengan baik.",
-            "type": "explanation"
+            "type": "quiz"
         }
     ]
 }

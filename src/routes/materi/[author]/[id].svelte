@@ -5,43 +5,26 @@
     const materials = res.materi;
     return { id, materials };
   }
-  //   const answerType = "one-choice"
-  //   const answerType = "multiple-choice"
-  // const answerType = "journal";
-  //   const answerType = "table"
-  //   const answerType = "essay"
 </script>
 
 <script>
-  import { onMount, afterUpdate } from "svelte";
-  import Siema from "siema";
-
   import Explanation from "../../../components/material/Explanation.svelte";
+  import Quiz from "../../../components/material/Quiz.svelte"
+  import Journal from "../../../components/answer/Journal.svelte";
 
   export let id;
   export let materials;
 
-  let newSiema;
   let thisInstance;
+  let currentSlide = 0;
 
-  onMount(async () => {
-    newSiema = materials.length > 0 ? new Siema() : null;
-  });
-
-  let currentSlide = 1;
-
-  const updateSlide = () => {
-    if(newSiema) currentSlide = currentSlide !== newSiema.current ? newSiema.currentSlide + 1 : 1;
+  const prev = () => {
+    if (currentSlide > 0) currentSlide--;
   };
 
-  const changeSlide = prevOrNext => {
-    prevOrNext === "next" ? newSiema.next() : newSiema.prev();
-    updateSlide();
+  const next = () => {
+    if (currentSlide < materials.length - 1) currentSlide++;
   };
-
-  // afterUpdate(() => {
-  //   updateSlide();
-  // })
 </script>
 
 <style lang="scss">
@@ -70,28 +53,36 @@
       font-weight: bold;
     }
   }
-  .author{
+  .author {
     color: #666;
   }
 </style>
 
 <div class="buttons">
-  <span class="prev click" on:click={() => changeSlide('prev')}>
+  <span class="prev click" on:click={prev}>
     <i class="caret square left outline icon" />
   </span>
-  <span class="text">
-    Materi {newSiema && currentSlide} / {newSiema && newSiema.innerElements.length}
-  </span>
-  <span class="next click" on:click={() => changeSlide('next')}>
+  <span class="text">Halaman {currentSlide + 1} / {materials.length}</span>
+  <span class="next click" on:click={next}>
     <i class="caret square right outline icon" />
   </span>
 </div>
 <div class="ui header">Modul Akuntansi Dasar I : Perusahaan Jasa</div>
 <div class="author">oleh JawabX</div>
+
 <div class="ui segment">
-  <div class="siema" bind:this={thisInstance} on:touchmove={updateSlide} on:mouseover={updateSlide}>
-    {#each materials as material}
-      <Explanation {material} />
-    {/each}
-  </div>
+  <!-- Concept / Quiz -->
+  {#if materials[currentSlide].type === "concept"}
+  <Explanation material={materials[currentSlide]} />
+  {:else if materials[currentSlide].type === "quiz"}
+  <Quiz material={materials[currentSlide]} />
+  {/if}
+  
+  <!-- Example / Answer -->
+  {#if materials[currentSlide].example}
+    <div class="ui header">Contoh</div>
+  {:else if materials[currentSlide].answer}
+    <div class="ui header">Jawab</div>
+  {/if}
+  <Journal material={materials[currentSlide]} />
 </div>

@@ -1,0 +1,29 @@
+{
+    "journal": [
+        {
+            "option": {
+                "1": "kas",
+                "2": "piutang",
+                "3": "perlengkapan",
+                "4": "modal",
+                "5": "utang"
+            },
+            "answer": {
+                "1": {
+                    "debit": 100000,
+                    "kredit": 0
+                },
+                "2": false,
+                "3": false,
+                "4": {
+                    "debit": 0,
+                    "kredit": 50000
+                },
+                "5": {
+                    "debit": 0,
+                    "kredit": 50000
+                }
+            }
+        }
+    ]
+}

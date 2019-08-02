@@ -1,9 +1,19 @@
 <script>
   export let material;
+  var clientX;
+
+  const stopLink = e => {
+    const newClientX = e.clientX
+    newClientX !== clientX && e.preventDefault();
+  };
+
+  const setPosition = e => {
+    const newClientX = e.clientX
+    clientX = newClientX
+  }
 </script>
 
 <style lang="scss">
-
   .slide-content {
     display: block;
     padding: 10px;
@@ -32,7 +42,7 @@
   .meta {
     font-size: 12px !important;
     @media (max-width: 980px) {
-      font-size: 10px!important;
+      font-size: 10px !important;
     }
   }
   .description,
@@ -43,7 +53,12 @@
   }
 </style>
 
-<a class="slide-content" href="materi/jawabx/213" rel="prefetch">
+<a
+  class="slide-content"
+  href="materi/jawabx/213"
+  rel="prefetch"
+  on:mousedown={setPosition}
+  on:click={stopLink}>
   <div class="ui card">
     <div class="image" />
     <div class="content">

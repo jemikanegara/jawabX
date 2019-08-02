@@ -24,6 +24,16 @@
     refreshStates();
   };
 
+  const shortcutSlide = firstOrLast => {
+    setTimeout(() => {
+      let copyOfStates = states;
+      firstOrLast === "first"
+        ? (copyOfStates.currentSlide = 0)
+        : (copyOfStates.currentSlide = states.slideLength);
+      states = copyOfStates;
+    }, 1000);
+  };
+
   onMount(() => {
     newSiema = new Siema({
       perPage: {
@@ -70,17 +80,23 @@
 
 <div class="slider">
   <div class="siema" bind:this={thisInstance}>
-      {#each materials as material}
-        <SingleCard {material} />
-      {/each}
+    {#each materials as material}
+      <SingleCard {material}/>
+    {/each}
   </div>
   {#if states.currentSlide !== 0}
-    <button class="prev" on:click={() => changeSlide('prev')}>
+    <button
+      class="prev"
+      on:click={() => changeSlide('prev')}
+      on:dblclick={() => shortcutSlide('first')}>
       <i class="chevron left icon" />
     </button>
   {/if}
   {#if states.currentSlide !== states.slideLength - states.perPage}
-    <button class="next" on:click={() => changeSlide('next')}>
+    <button
+      class="next"
+      on:click={() => changeSlide('next')}
+      on:dblclick={() => shortcutSlide('last')}>
       <i class="chevron right icon" />
     </button>
   {/if}
