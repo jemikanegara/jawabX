@@ -1,5 +1,7 @@
 <script>
   export let material;
+  export let i;
+  export let refreshStates;
   var clientX;
 
   const stopLink = e => {
@@ -10,6 +12,10 @@
   const setPosition = e => {
     const newClientX = e.clientX
     clientX = newClientX
+  }
+
+  const refresh = e => {
+    refreshStates();
   }
 </script>
 
@@ -58,12 +64,13 @@
   href="materi/jawabx/213"
   rel="prefetch"
   on:mousedown={setPosition}
-  on:click={stopLink}>
+  on:click={stopLink}
+  on:mousemove={refresh}>
   <div class="ui card">
     <div class="image" />
     <div class="content">
       <!-- Title -->
-      <div class="header">{material.title}</div>
+      <div class="header">{i}{material.title}</div>
       <!-- Author -->
       <div class="meta">{material.author}</div>
       <!-- Description -->

@@ -25,13 +25,10 @@
   };
 
   const shortcutSlide = firstOrLast => {
-    setTimeout(() => {
-      let copyOfStates = states;
-      firstOrLast === "first"
-        ? (copyOfStates.currentSlide = 0)
-        : (copyOfStates.currentSlide = states.slideLength);
-      states = copyOfStates;
-    }, 1000);
+    firstOrLast === "first"
+      ? newSiema.prev(newSiema.currentSlide)
+      : newSiema.next(newSiema.innerElements.length - newSiema.currentSlide);
+    refreshStates();
   };
 
   onMount(() => {
@@ -79,25 +76,29 @@
 </style>
 
 <div class="slider">
+  <!-- Slider -->
   <div class="siema" bind:this={thisInstance}>
-    {#each materials as material}
-      <SingleCard {material}/>
+    {#each materials as material, i}
+      <SingleCard {material} {i} {refreshStates} />
     {/each}
   </div>
-  {#if states.currentSlide !== 0}
-    <button
-      class="prev"
-      on:click={() => changeSlide('prev')}
-      on:dblclick={() => shortcutSlide('first')}>
-      <i class="chevron left icon" />
-    </button>
-  {/if}
-  {#if states.currentSlide !== states.slideLength - states.perPage}
-    <button
-      class="next"
-      on:click={() => changeSlide('next')}
-      on:dblclick={() => shortcutSlide('last')}>
-      <i class="chevron right icon" />
-    </button>
-  {/if}
+
+  <!-- Back Arrow -->
+  <button
+    class="prev"
+    style={states.currentSlide === 0 && 'opacity: 0;'}
+    on:click={() => changeSlide('prev')}
+    on:dblclick={() => shortcutSlide('first')}>
+    <i class="chevron left icon" />
+  </button>
+
+  <!-- Next Arrow -->
+  <button
+    class="next"
+    style={states.currentSlide === states.slideLength - states.perPage && 'opacity: 0;'}
+    on:click={() => changeSlide('next')}
+    on:dblclick={() => shortcutSlide('last')}>
+    <i class="chevron right icon" />
+  </button>
+
 </div>
