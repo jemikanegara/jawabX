@@ -2,18 +2,19 @@
   export async function preload({ params }) {
     const id = params.id;
     const res = await this.fetch("/explanation.json").then(res => res.json());
-    const materials = res.materi;
-    return { id, materials };
+    const xmodules = await res.modul;
+
+    return { id, xmodules };
   }
 </script>
 
 <script>
-  import Explanation from "../../../components/material/Explanation.svelte";
-  import Quiz from "../../../components/material/Quiz.svelte"
+  import Explanation from "../../../components/xmodule/Explanation.svelte";
+  import Quiz from "../../../components/xmodule/Quiz.svelte";
   import Journal from "../../../components/answer/Journal.svelte";
 
   export let id;
-  export let materials;
+  export let xmodules;
 
   let thisInstance;
   let currentSlide = 0;
@@ -23,7 +24,7 @@
   };
 
   const next = () => {
-    if (currentSlide < materials.length - 1) currentSlide++;
+    if (currentSlide < xmodules.length - 1) currentSlide++;
   };
 </script>
 
@@ -62,27 +63,26 @@
   <span class="prev click" on:click={prev}>
     <i class="caret square left outline icon" />
   </span>
-  <span class="text">Halaman {currentSlide + 1} / {materials.length}</span>
+  <span class="text">Halaman {currentSlide + 1} / {xmodules.length}</span>
   <span class="next click" on:click={next}>
     <i class="caret square right outline icon" />
   </span>
 </div>
 <div class="ui header">Modul Akuntansi Dasar I : Perusahaan Jasa</div>
 <div class="author">oleh JawabX</div>
-
 <div class="ui segment">
   <!-- Concept / Quiz -->
-  {#if materials[currentSlide].type === "concept"}
-  <Explanation material={materials[currentSlide]} />
-  {:else if materials[currentSlide].type === "quiz"}
-  <Quiz material={materials[currentSlide]} />
+  {#if xmodules[currentSlide].type === 'concept'}
+    <Explanation xmodule={xmodules[currentSlide]} />
+  {:else if xmodules[currentSlide].type === 'quiz'}
+    <Quiz xmodule={xmodules[currentSlide]} />
   {/if}
-  
+
   <!-- Example / Answer -->
-  {#if materials[currentSlide].example}
+  {#if xmodules[currentSlide].example}
     <div class="ui header">Contoh</div>
-  {:else if materials[currentSlide].answer}
+  {:else if xmodules[currentSlide].answer}
     <div class="ui header">Jawab</div>
   {/if}
-  <Journal material={materials[currentSlide]} />
+  <Journal xmodule={xmodules[currentSlide]} />
 </div>

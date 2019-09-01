@@ -1,5 +1,5 @@
 <script>
-  export let material;
+  export let xmodule;
   export let i;
   export let refreshStates;
   var clientX;
@@ -61,7 +61,7 @@
 
 <a
   class="slide-content"
-  href="materi/jawabx/213"
+  href="modul/jawabx/213"
   rel="prefetch"
   on:mousedown={setPosition}
   on:click={stopLink}
@@ -70,13 +70,13 @@
     <div class="image" />
     <div class="content">
       <!-- Title -->
-      <div class="header">{i}{material.title}</div>
+      <div class="header">{i}{xmodule.title}</div>
       <!-- Author -->
-      <div class="meta">{material.author}</div>
+      <div class="meta">{xmodule.author}</div>
       <!-- Description -->
-      <div class="description">{material.description}</div>
+      <div class="description">{xmodule.description}</div>
     </div>
     <!-- Tried -->
-    <div class="extra content">{material.tried} kali dikerjakan</div>
+    <div class="extra content">{xmodule.tried} kali dikerjakan</div>
   </div>
 </a>

@@ -3,7 +3,7 @@
   import Siema from "siema";
   import { onMount } from "svelte";
 
-  export let materials;
+  export let xmodules;
 
   let newSiema;
   let thisInstance;
@@ -78,8 +78,8 @@
 <div class="slider">
   <!-- Slider -->
   <div class="siema" bind:this={thisInstance}>
-    {#each materials as material, i}
-      <SingleCard {material} {i} {refreshStates} />
+    {#each xmodules as xmodule, i}
+      <SingleCard {xmodule} {i} {refreshStates} />
     {/each}
   </div>
 

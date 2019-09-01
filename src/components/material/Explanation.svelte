@@ -1,8 +1,0 @@
-<script>
-  export let material;
-</script>
-
-<span>
-  <div class="ui header">Konsep</div>
-  <div class="description">{@html material.description}</div>
-</span>

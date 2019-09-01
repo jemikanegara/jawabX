@@ -11,9 +11,9 @@
       prefetch: false
     },
     {
-      url: "materi",
-      segment: "materi",
-      text: "Materi",
+      url: "modul",
+      segment: "modul",
+      text: "Modul",
       prefetch: false
     }
   ];
@@ -78,7 +78,7 @@
     {/if}
 
     <!-- Desktop Right Menu -->
-    {#if !'materi'.includes(segment)}
+    {#if !'modul'.includes(segment)}
       <div class="right menu">
         <div class="item">
           <Search />

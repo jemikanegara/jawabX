@@ -1,10 +1,10 @@
 <script context="module">
   export function preload() {
-    return this.fetch(`/materials.json`)
+    return this.fetch(`/xmodules.json`)
       .then(r => r.json())
       .then(res => {
-        const materials = res.materials;
-        return { materials };
+        const xmodules = res.xmodules;
+        return { xmodules };
       });
   }
 </script>
@@ -12,7 +12,7 @@
 <script>
   import Carousels from "../components/Carousels.svelte";
   import { types } from "../stores/type.js";
-  export let materials;
+  export let xmodules;
 </script>
 
 <!-- Set Title -->
@@ -23,6 +23,6 @@
 <!-- Carousels -->
 {#if $types.length > 0}
   {#each $types as type, index}
-    <Carousels title={type.title} {materials} />
+    <Carousels title={type.title} {xmodules} />
   {/each}
 {/if}

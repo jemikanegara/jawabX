@@ -1,6 +1,6 @@
 <script>
   import HomeCarousel from "./HomeCarousel.svelte";
-  export let materials;
+  export let xmodules;
   export let title;
 </script>
 
@@ -8,4 +8,4 @@
 <h2 class="ui header">{title}</h2>
 
 <!-- Carousel -->
-<HomeCarousel {materials}/>
+<HomeCarousel {xmodules}/>

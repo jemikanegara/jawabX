@@ -1,6 +1,6 @@
 import { readable } from 'svelte/store';
 
-const materialTypes = [
+const xmoduleTypes = [
     {
         title: "Modul Belajar"
     },
@@ -8,7 +8,7 @@ const materialTypes = [
     { title: "Tes" }
 ]
 
-export const types = readable(materialTypes, (set) => {
-    set(materialTypes);
+export const types = readable(xmoduleTypes, (set) => {
+    set(xmoduleTypes);
     return () => {}
 });
