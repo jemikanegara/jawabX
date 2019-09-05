@@ -1,12 +1,22 @@
+// export const query = `{
+//     modules {
+//       title
+//       pages {
+//         explanation
+//         answers {
+//           type
+//           answer
+//         }
+//       }
+//     }
+// }`;
+
 export const query = `{
-    modules {
-      title
-      pages {
-        explanation
-        answers {
-          type
-          answer
-        }
-      }
+  modules {
+    title
+    user {
+      email
     }
+    description
+  }
 }`;
