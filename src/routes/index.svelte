@@ -16,7 +16,6 @@
   import Carousels from "../components/Carousels.svelte";
   import { types } from "../stores/type.js";
   export let xmodules;
-  console.log(xmodules)
 </script>
 
 <!-- Set Title -->

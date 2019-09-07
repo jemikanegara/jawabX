@@ -72,7 +72,7 @@
       <!-- Title -->
       <div class="header">{i}{xmodule.title}</div>
       <!-- Author -->
-      <div class="meta">{xmodule.username}</div>
+      <div class="meta">{xmodule.user.username || xmodule.user._id}</div>
       <!-- Description -->
       <div class="description">{xmodule.description}</div>
     </div>

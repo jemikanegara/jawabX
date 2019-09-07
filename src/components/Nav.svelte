@@ -55,7 +55,7 @@
       }
     }
     .item {
-      width: 88%;
+      width: 86%;
     }
   }
 </style>

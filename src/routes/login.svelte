@@ -45,16 +45,16 @@
     <div class="column">
       <div class="ui form">
         <div class="field">
-          <label>Username</label>
+          <label>Email</label>
           <div class="ui left icon input">
-            <input type="text" placeholder="Username" />
+            <input type="email" placeholder="Email" />
             <i class="user icon" />
           </div>
         </div>
         <div class="field">
-          <label>Password</label>
+          <label>Kata Sandi</label>
           <div class="ui left icon input">
-            <input type="password" />
+            <input type="password" placeholder="Kata Sandi"/>
             <i class="lock icon" />
           </div>
         </div>
@@ -62,12 +62,14 @@
       </div>
     </div>
     <div class="middle aligned column">
-      <div class="ui horizontal divider">Or</div>
-      <div class="ui big button">
-        <i class="signup icon" />
-        Sign Up
-      </div>
+      <div class="ui horizontal divider">Atau</div>
+      <a href="/register">
+        <div class="ui big button">
+          <i class="signup icon" />
+          Daftar
+        </div>
+      </a>
     </div>
   </div>
-  <div class="ui vertical divider">Or</div>
+  <div class="ui vertical divider">Atau</div>
 </div>
