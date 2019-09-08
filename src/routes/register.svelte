@@ -1,6 +1,21 @@
 <script>
   import { JSON_OPT, URL } from "../graphql/settings.js";
   import { query } from "../graphql/mutations/register.js";
+  import { tokenCheck } from "../graphql/auth.js";
+  import { onMount } from "svelte";
+  import { auth, success } from "../stores/auth.js";
+  import { goto } from "@sapper/app";
+
+  onMount(async () => {
+    const token = localStorage.getItem("token");
+    const isAuth = await tokenCheck(token);
+    if (isAuth.data && isAuth.data.auth) {
+      auth.set(true);
+      goto("/");
+    }
+  });
+
+  let successMessage;
 
   const regFields = [
     {
@@ -84,8 +99,6 @@
     passwordCheck = regEl.password.value === regEl.confirm.value;
     if (!passwordCheck) return;
 
-    console.log(query(values));
-
     fetch(URL, {
       ...JSON_OPT,
       body: JSON.stringify({ query: query(values), variables: values })
@@ -94,6 +107,13 @@
       .then(res => {
         if (res.data) {
           localStorage.setItem("token", res.data.register);
+          auth.set(true);
+          success.set("Akun anda berhasil terdaftar");
+          goto("/");
+          // successMessage = $success;
+          // setTimeout(() => {
+          //   window.location = "/";
+          // }, 4000);
         }
       })
       .catch(err => console.log(err));
@@ -210,7 +230,7 @@
           </label>
         </div> -->
       </div>
-      <button class="ui primary button" type="submit">Submit</button>
+      <button class="ui primary button" type="submit">Daftar</button>
     </form>
   </div>
 </div>

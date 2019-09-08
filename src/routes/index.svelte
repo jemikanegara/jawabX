@@ -15,13 +15,30 @@
 <script>
   import Carousels from "../components/Carousels.svelte";
   import { types } from "../stores/type.js";
+  import { success } from "../stores/auth.js";
+  import { onDestroy } from "svelte";
   export let xmodules;
+
+  onDestroy(() => {
+    success.set(null);
+  });
 </script>
 
 <!-- Set Title -->
 <svelte:head>
-  <title>Sapper project template</title>
+  <title>JawabX - Berbagi Pengetahuan</title>
 </svelte:head>
+
+{#if $success}
+  <div class="ui success message">
+    <i
+      class="close icon"
+      on:click={() => {
+        success.set(null);
+      }} />
+    <b>{$success}</b>
+  </div>
+{/if}
 
 <!-- Carousels -->
 {#if $types.length > 0}

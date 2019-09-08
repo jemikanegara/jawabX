@@ -75,6 +75,8 @@
     <!-- Mobile Login Button -->
     {#if windowWidth <= 980 && !$auth}
       <LoginButton {segment} />
+    {:else if windowWidth <= 980 && $auth}
+      <LoginButton segment="logout" />
     {/if}
 
     <!-- Desktop Right Menu -->
@@ -86,6 +88,8 @@
         <!-- Dekstop Login Button -->
         {#if windowWidth > 980 && !$auth}
           <LoginButton {segment} />
+        {:else if windowWidth > 980 && $auth}
+          <LoginButton segment="logout" />
         {/if}
       </div>
     {/if}
