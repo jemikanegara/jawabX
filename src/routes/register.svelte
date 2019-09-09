@@ -2,17 +2,13 @@
   import { JSON_OPT, URL } from "../graphql/settings.js";
   import { query } from "../graphql/mutations/register.js";
   import { tokenCheck } from "../graphql/auth.js";
-  import { onMount } from "svelte";
   import { auth, success } from "../stores/auth.js";
   import { goto } from "@sapper/app";
+  import { onMount } from "svelte";
 
   onMount(async () => {
-    const token = localStorage.getItem("token");
-    const isAuth = await tokenCheck(token);
-    if (isAuth.data && isAuth.data.auth) {
-      auth.set(true);
-      goto("/");
-    }
+    const isAuth = await tokenCheck();
+    if (isAuth) goto("/");
   });
 
   let successMessage;
@@ -101,19 +97,15 @@
 
     fetch(URL, {
       ...JSON_OPT,
-      body: JSON.stringify({ query: query(values), variables: values })
+      body: JSON.stringify({ query, variables: values })
     })
       .then(r => r.json())
       .then(res => {
         if (res.data) {
           localStorage.setItem("token", res.data.register);
           auth.set(true);
-          success.set("Akun anda berhasil terdaftar");
+          success.set("Akunmu berhasil didaftarkan");
           goto("/");
-          // successMessage = $success;
-          // setTimeout(() => {
-          //   window.location = "/";
-          // }, 4000);
         }
       })
       .catch(err => console.log(err));
@@ -121,9 +113,6 @@
 </script>
 
 <style>
-  /* .check-label {
-    cursor: pointer !important;
-  } */
   form {
     min-width: 45vw;
   }
@@ -219,16 +208,6 @@
           Dengan mendaftar, saya menyetujui Syarat dan Ketentuan serta Kebijakan
           Privasi.
         </div>
-        <!-- <div class="ui checkbox">
-          <input
-            type="checkbox"
-            tabindex="0"
-            id="register-check"
-            bind:checked={regEl.checkbox.value} />
-          <label for="register-check" class="check-label">
-            Dengan mendaftar, Saya menyetujui Syarat dan Ketentuan serta Kebijakan Privasi.
-          </label>
-        </div> -->
       </div>
       <button class="ui primary button" type="submit">Daftar</button>
     </form>

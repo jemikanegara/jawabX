@@ -1,16 +1,61 @@
 <script>
-  import { auth } from "../stores/auth.js";
+  import { auth, success } from "../stores/auth.js";
   import { onMount } from "svelte";
+  import { tokenCheck } from "../graphql/auth.js";
   import { goto } from "@sapper/app";
-  const login = () => {
-    $auth = true;
-    loggedIn();
+  import { query } from "../graphql/mutations/login.js";
+  import { JSON_OPT, URL } from "../graphql/settings.js";
+
+  let email = "";
+  let password = "";
+  let errorMsg = {
+    email: "",
+    password: "",
+    fail: ""
   };
-  const loggedIn = () => {
-    $auth && goto(".");
+
+  const login = e => {
+    e.preventDefault();
+
+    for (let key in errorMsg) {
+      errorMsg[key] = "";
+    }
+
+    if (!email || email === "") {
+      errorMsg.email = "Email tidak boleh kosong";
+    }
+
+    if (!password || password === "") {
+      errorMsg.password = "Password tidak boleh kosong";
+      return;
+    }
+
+    fetch(URL, {
+      ...JSON_OPT,
+      body: JSON.stringify({
+        query,
+        variables: { email, password }
+      })
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res.errors) {
+          errorMsg.fail = "email atau kata sandi tidak cocok";
+          return;
+        }
+        if (res.data) {
+          localStorage.setItem("token", res.data.login);
+          auth.set(true);
+          success.set("Kamu berhasil masuk");
+          goto("/");
+        }
+      })
+      .catch(err => console.log(err));
   };
-  onMount(() => {
-    loggedIn();
+
+  onMount(async () => {
+    const isAuth = await tokenCheck();
+    if (isAuth) goto("/");
   });
 </script>
 
@@ -43,23 +88,57 @@
 <div class="ui placeholder segment">
   <div class="ui two column very relaxed stackable grid">
     <div class="column">
-      <div class="ui form">
+      <form class="ui form" on:submit={login}>
         <div class="field">
           <label>Email</label>
           <div class="ui left icon input">
-            <input type="email" placeholder="Email" />
+            <input type="text" placeholder="Email" bind:value={email} />
             <i class="user icon" />
           </div>
+          {#if errorMsg.email && errorMsg.email !== ''}
+            <div class="ui negative message field">
+              <i
+                class="close icon"
+                on:click={() => {
+                  errorMsg.email = '';
+                }} />
+              <b>{errorMsg.email}</b>
+            </div>
+          {/if}
         </div>
         <div class="field">
           <label>Kata Sandi</label>
           <div class="ui left icon input">
-            <input type="password" placeholder="Kata Sandi"/>
+            <input
+              type="password"
+              placeholder="Kata Sandi"
+              bind:value={password} />
             <i class="lock icon" />
           </div>
+          {#if errorMsg.password && errorMsg.password !== ''}
+            <div class="ui negative message field">
+              <i
+                class="close icon"
+                on:click={() => {
+                  errorMsg.password = '';
+                }} />
+              <b>{errorMsg.password}</b>
+            </div>
+          {/if}
         </div>
-        <div class="ui blue submit button" on:click={login}>Login</div>
-      </div>
+        <button class="ui blue submit button fluid">Masuk</button>
+        <br />
+        {#if errorMsg.fail && errorMsg.fail !== ''}
+          <div class="ui negative message field">
+            <i
+              class="close icon"
+              on:click={() => {
+                errorMsg.fail = '';
+              }} />
+            <b>{errorMsg.fail}</b>
+          </div>
+        {/if}
+      </form>
     </div>
     <div class="middle aligned column">
       <div class="ui horizontal divider">Atau</div>

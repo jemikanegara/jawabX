@@ -1,6 +1,12 @@
 <script>
   import { auth } from "../stores/auth.js";
+
   export let segment;
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location = "/";
+  };
 </script>
 
 <style lang="scss">
@@ -13,15 +19,8 @@
   }
 </style>
 
-{#if segment !== 'login'}
+{#if segment !== 'login' && !$auth}
   <a href="login" class="ui item">Masuk</a>
-{:else}
-  <a
-    href="/"
-    class="ui item"
-    on:click={() => {
-      auth.set(false);
-    }}>
-    Keluar
-  </a>
+{:else if $auth}
+  <a href="/" class="ui item" on:click={logout}>Keluar</a>
 {/if}

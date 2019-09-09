@@ -1,6 +1,14 @@
 <script>
   import Nav from "../components/Nav.svelte";
+  import { tokenCheck } from "../graphql/auth.js";
+  import { goto } from "@sapper/app";
+  import { onMount } from "svelte";
+  
   export let segment;
+
+  onMount(async () => {
+    await tokenCheck();
+  });
 </script>
 
 <style>
@@ -21,6 +29,6 @@
 </style>
 
 <Nav {segment} />
-<main class="ui container" >
+<main class="ui container">
   <slot />
 </main>
