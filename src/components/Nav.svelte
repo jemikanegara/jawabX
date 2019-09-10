@@ -1,7 +1,7 @@
 <script>
   export let segment;
   import Search from "./Search.svelte";
-  import LoginButton from "./LoginButton.svelte";
+  import AuthButton from "./AuthButton.svelte";
   import { auth } from "../stores/auth.js";
   let routes = [
     {
@@ -74,9 +74,9 @@
 
     <!-- Mobile Login Button -->
     {#if windowWidth <= 980 && !$auth}
-      <LoginButton {segment} />
+      <AuthButton {segment} />
     {:else if windowWidth <= 980 && $auth}
-      <LoginButton segment="logout" />
+      <AuthButton segment="logout" />
     {/if}
 
     <!-- Desktop Right Menu -->
@@ -87,9 +87,9 @@
         </div>
         <!-- Dekstop Login Button -->
         {#if windowWidth > 980 && !$auth}
-          <LoginButton {segment} />
+          <AuthButton {segment} />
         {:else if windowWidth > 980 && $auth}
-          <LoginButton segment="logout" />
+          <AuthButton segment="logout" />
         {/if}
       </div>
     {/if}

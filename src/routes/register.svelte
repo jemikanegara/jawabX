@@ -5,75 +5,12 @@
   import { auth, success } from "../stores/auth.js";
   import { goto } from "@sapper/app";
   import { onMount } from "svelte";
+  import { regEl, regFields } from "../data/register.js";
 
   onMount(async () => {
     const isAuth = await tokenCheck();
     if (isAuth) goto("/");
   });
-
-  let successMessage;
-
-  const regFields = [
-    {
-      label: "Nama",
-      type: "text",
-      bind: "name"
-    },
-    {
-      label: "Email",
-      type: "text",
-      bind: "email"
-    },
-    {
-      label: "Kata Sandi",
-      type: "password",
-      bind: "password"
-    },
-    {
-      label: "Konfirmasi Kata Sandi",
-      type: "password",
-      bind: "confirm"
-    },
-    {
-      label: "Nomor Ponsel (Opsional)",
-      type: "text",
-      bind: "phone"
-    }
-  ];
-
-  const regEl = {
-    name: {
-      value: "",
-      errors: {
-        empty: false
-      }
-    },
-    email: {
-      value: "",
-      errors: {
-        empty: false
-      }
-    },
-    password: {
-      value: "",
-      errors: {
-        empty: false
-      }
-    },
-    confirm: {
-      value: "",
-      errors: {
-        empty: false
-      }
-    },
-    phone: {
-      value: "",
-      optional: true,
-      errors: {
-        empty: false
-      }
-    }
-  };
 
   let passwordCheck = true;
 
@@ -83,32 +20,51 @@
     let values = {};
     let error = [];
 
+    // Check for empty fields
     for (let key in regEl) {
+      // Check if field is empty
       if (regEl[key].value === "" && !regEl[key].optional) {
         regEl[key].errors.empty = true;
         error = [...error, key];
       }
+      // Check if field is just password confirmation
       if (key !== "confirm") values[key] = regEl[key].value;
     }
+
+    // If empty fields found return
     if (error.length > 0) return;
 
+    // Check for password match with confirmation
     passwordCheck = regEl.password.value === regEl.confirm.value;
+
+    // If password doesn't match then return
     if (!passwordCheck) return;
 
+    // Register AJAX
     fetch(URL, {
       ...JSON_OPT,
       body: JSON.stringify({ query, variables: values })
     })
       .then(r => r.json())
       .then(res => {
-        if (res.data) {
+        // If AJAX Fail but server throw errors
+        if (res.errors) {
+          console.log(regEl.errors);
+          return;
+        }
+        // If AJAX Success
+        else if (res.data) {
           localStorage.setItem("token", res.data.register);
           auth.set(true);
           success.set("Akunmu berhasil didaftarkan");
           goto("/");
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        // If AJAX Fail
+        // TODO
+        console.log(err);
+      });
   };
 </script>
 
@@ -116,6 +72,7 @@
   form {
     min-width: 45vw;
   }
+
   .left-section {
     text-align: center;
     padding-right: 50px;
