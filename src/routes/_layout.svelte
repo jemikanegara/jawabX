@@ -1,7 +1,6 @@
 <script>
   import Nav from "../components/Nav.svelte";
   import { tokenCheck } from "../graphql/auth.js";
-  import { goto } from "@sapper/app";
   import { onMount } from "svelte";
   
   export let segment;

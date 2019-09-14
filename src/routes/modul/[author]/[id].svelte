@@ -10,7 +10,6 @@
 
 <script>
   import Explanation from "../../../components/xmodule/Explanation.svelte";
-  import Quiz from "../../../components/xmodule/Quiz.svelte";
   import Journal from "../../../components/answer/Journal.svelte";
 
   export let id;
@@ -72,11 +71,9 @@
 <div class="author">oleh JawabX</div>
 <div class="ui segment">
   <!-- Concept / Quiz -->
-  {#if xmodules[currentSlide].type === 'concept'}
-    <Explanation xmodule={xmodules[currentSlide]} />
-  {:else if xmodules[currentSlide].type === 'quiz'}
-    <Quiz xmodule={xmodules[currentSlide]} />
-  {/if}
+  <Explanation
+    xmodule={xmodules[currentSlide]}
+    title={xmodules[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
 
   <!-- Example / Answer -->
   {#if xmodules[currentSlide].example}

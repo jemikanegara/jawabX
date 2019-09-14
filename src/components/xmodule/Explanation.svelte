@@ -1,8 +1,9 @@
 <script>
   export let xmodule;
+  export let title;
 </script>
 
 <span>
-  <div class="ui header">Konsep</div>
+  <div class="ui header">{title}</div>
   <div class="description">{@html xmodule.description}</div>
 </span>

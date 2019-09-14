@@ -3,6 +3,8 @@
   import Search from "./Search.svelte";
   import AuthButton from "./AuthButton.svelte";
   import { auth } from "../stores/auth.js";
+  import { onMount } from "svelte";
+
   let routes = [
     {
       url: ".",
@@ -19,6 +21,29 @@
   ];
 
   let windowWidth;
+  let nav;
+
+  onMount(() => {
+    nav.classList.remove("show");
+    scrollingNav();
+  });
+
+  const scrollingNav = () => {
+    let prevScrollpos = window.pageYOffset;
+    window.onscroll = () => {
+      let currentScrollPos = window.pageYOffset;
+      let isShow = nav.classList.contains("show");
+      if (currentScrollPos === 0) {
+        isShow && nav.classList.remove("show");
+      } else if (prevScrollpos > currentScrollPos) {
+        !isShow && nav.classList.add("show");
+        nav.style.top = "0";
+      } else {
+        nav.style.top = "-50px";
+      }
+      prevScrollpos = currentScrollPos;
+    };
+  };
 </script>
 
 <style lang="scss">
@@ -58,10 +83,21 @@
       width: 86%;
     }
   }
+
+  nav {
+    transition: top 0.3s;
+  }
+
+  nav.show {
+    position: fixed !important;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+  }
 </style>
 
 <svelte:window bind:innerWidth={windowWidth} />
-<nav class="ui pointing menu">
+<nav class="ui pointing menu show" bind:this={nav}>
   <div class="ui container">
     <!-- Main Menu -->
     {#each routes as route}
@@ -80,19 +116,17 @@
     {/if}
 
     <!-- Desktop Right Menu -->
-    {#if !'modul'.includes(segment)}
-      <div class="right menu">
-        <div class="item">
-          <Search />
-        </div>
-        <!-- Dekstop Login Button -->
-        {#if windowWidth > 980 && !$auth}
-          <AuthButton {segment} />
-        {:else if windowWidth > 980 && $auth}
-          <AuthButton segment="logout" />
-        {/if}
+    <div class="right menu">
+      <div class="item">
+        <Search />
       </div>
-    {/if}
+      <!-- Dekstop Login Button -->
+      {#if windowWidth > 980 && !$auth}
+        <AuthButton {segment} />
+      {:else if windowWidth > 980 && $auth}
+        <AuthButton segment="logout" />
+      {/if}
+    </div>
 
   </div>
 </nav>
