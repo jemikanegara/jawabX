@@ -33,7 +33,7 @@
     window.onscroll = () => {
       let currentScrollPos = window.pageYOffset;
       let isShow = nav.classList.contains("show");
-      if (currentScrollPos === 0) {
+      if (currentScrollPos < 50) {
         isShow && nav.classList.remove("show");
       } else if (prevScrollpos > currentScrollPos) {
         !isShow && nav.classList.add("show");
