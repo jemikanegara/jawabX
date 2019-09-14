@@ -28,7 +28,8 @@
         error = [...error, key];
       }
       // Check if field is just password confirmation
-      if (key !== "confirm") values[key] = regEl[key].value;
+      if (key !== "confirm" && regEl[key].value.length > 0)
+        values[key] = regEl[key].value;
     }
 
     // If empty fields found return
