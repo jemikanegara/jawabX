@@ -1,5 +1,5 @@
 <script>
-  import { JSON_OPT, URL } from "../graphql/settings.js";
+  import { ajax } from "../graphql/settings.js";
   import { query } from "../graphql/mutations/register.js";
   import { tokenCheck } from "../graphql/auth.js";
   import { auth, success } from "../stores/auth.js";
@@ -14,7 +14,7 @@
 
   let passwordCheck = true;
 
-  const register = e => {
+  const register = async e => {
     e.preventDefault();
 
     let values = {};
@@ -41,30 +41,20 @@
     if (!passwordCheck) return;
 
     // Register AJAX
-    fetch(URL, {
-      ...JSON_OPT,
-      body: JSON.stringify({ query, variables: values })
-    })
-      .then(r => r.json())
-      .then(res => {
-        // If AJAX Fail but server throw errors
-        if (res.errors) {
-          console.log(regEl.errors);
-          return;
-        }
-        // If AJAX Success
-        else if (res.data) {
-          localStorage.setItem("token", res.data.register);
-          auth.set(true);
-          success.set("Akunmu berhasil didaftarkan");
-          goto("/");
-        }
-      })
-      .catch(err => {
-        // If AJAX Fail
-        // TODO
-        console.log(err);
-      });
+    const res = await ajax(fetch, { query, variables: values });
+
+    // If AJAX Fail but server throw errors
+    if (res.errors) {
+      return;
+    }
+
+    // If AJAX Success
+    else if (res.data) {
+      localStorage.setItem("token", res.data.register);
+      auth.set(true);
+      success.set("Akunmu berhasil didaftarkan");
+      goto("/");
+    }
   };
 </script>
 

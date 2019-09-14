@@ -4,7 +4,7 @@
   import { tokenCheck } from "../graphql/auth.js";
   import { goto } from "@sapper/app";
   import { query } from "../graphql/mutations/login.js";
-  import { JSON_OPT, URL } from "../graphql/settings.js";
+  import { ajax } from "../graphql/settings.js";
 
   let email = "";
   let password = "";
@@ -14,7 +14,7 @@
     fail: ""
   };
 
-  const login = e => {
+  const login = async e => {
     e.preventDefault();
 
     for (let key in errorMsg) {
@@ -22,35 +22,26 @@
     }
 
     if (!email || email === "") {
-      errorMsg.email = "Email tidak boleh kosong";
+      errorMsg.email = "Mohon isi kolom email";
     }
 
     if (!password || password === "") {
-      errorMsg.password = "Password tidak boleh kosong";
+      errorMsg.password = "Mohon isi kolom password";
       return;
     }
 
-    fetch(URL, {
-      ...JSON_OPT,
-      body: JSON.stringify({
-        query,
-        variables: { email, password }
-      })
-    })
-      .then(r => r.json())
-      .then(res => {
-        if (res.errors) {
-          errorMsg.fail = "email atau kata sandi tidak cocok";
-          return;
-        }
-        if (res.data) {
-          localStorage.setItem("token", res.data.login);
-          auth.set(true);
-          success.set("Kamu berhasil masuk");
-          goto("/");
-        }
-      })
-      .catch(err => console.log(err));
+    const variables = { email, password };
+    const res = await ajax(fetch, { query, variables });
+
+    if (res.errors) {
+      errorMsg.fail = "email atau kata sandi tidak cocok";
+      return;
+    } else if (res.data) {
+      localStorage.setItem("token", res.data.login);
+      auth.set(true);
+      success.set("Kamu berhasil masuk");
+      goto("/");
+    }
   };
 
   onMount(async () => {

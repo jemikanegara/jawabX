@@ -1,22 +1,31 @@
 <script>
+  import { onMount } from "svelte";
+  import { IMG_URL } from "../data/url.js";
+
   export let xmodule;
   export let i;
   export let refreshStates;
+
   var clientX;
+  let image;
+  let backgroundImage = `background: url('${IMG_URL}/${xmodule.images[0].medium}') no-repeat;`;
+  let backgroundSize = `background-size: cover;`;
+  let imgStyle = `${backgroundImage}${backgroundSize}`;
 
   const stopLink = e => {
-    const newClientX = e.clientX
+    const newClientX = e.clientX;
     newClientX !== clientX && e.preventDefault();
   };
 
   const setPosition = e => {
-    const newClientX = e.clientX
-    clientX = newClientX
-  }
+    const newClientX = e.clientX;
+    clientX = newClientX;
+  };
 
   const refresh = e => {
     refreshStates();
-  }
+  };
+
 </script>
 
 <style lang="scss">
@@ -67,12 +76,12 @@
   on:click={stopLink}
   on:mousemove={refresh}>
   <div class="ui card">
-    <div class="image" />
+    <div class="image" style={imgStyle} />
     <div class="content">
       <!-- Title -->
       <div class="header">{i}{xmodule.title}</div>
       <!-- Author -->
-      <div class="meta">{xmodule.user.username || xmodule.user._id}</div>
+      <div class="meta">{xmodule.user.name}</div>
       <!-- Description -->
       <div class="description">{xmodule.description}</div>
     </div>

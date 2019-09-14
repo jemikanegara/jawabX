@@ -3,8 +3,12 @@ export const query = `{
     title
     user {
       _id
-      username
+      name
     }
     description
+    images {
+      medium
+    }
+    type
   }
 }`;

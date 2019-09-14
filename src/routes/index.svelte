@@ -1,17 +1,14 @@
 <script context="module">
-  import { JSON_OPT, URL } from "../graphql/settings.js";
+  import { ajax } from "../graphql/settings.js";
   import { query } from "../graphql/queries/index.js";
 
-  export function preload() {
-    return this.fetch(URL, { ...JSON_OPT, body: JSON.stringify({ query }) })
-      .then(r => r.json())
-      .then(res => {
-        if (res.errors || res.data.modules.length < 1)
-          this.redirect(301, "/maintenance");
-        // return { xmodules: false };
-        const xmodules = res.data.modules;
-        return { xmodules };
-      });
+  export async function preload() {
+    const res = await ajax(this.fetch, { query });
+    if (res.errors || res.data.modules.length < 1)
+      this.redirect(301, "/maintenance");
+
+    const xmodules = res.data.modules;
+    return { xmodules };
   }
 </script>
 

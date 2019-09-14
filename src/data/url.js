@@ -1,0 +1,1 @@
+export const IMG_URL = 'https://jawabx.s3.ap-southeast-1.amazonaws.com'

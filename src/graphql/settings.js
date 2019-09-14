@@ -2,16 +2,24 @@ export const URL = `http://localhost:4000`;
 
 const method = 'POST'
 
-export const JSON_OPT = {
-    method,
-    headers: {
-        'Content-Type': 'application/json'
-    }
+const TOKEN = (token) => {
+    return token && { 'Authorization': `Bearer ${token}` }
 }
 
-export const MULTI_OPT = {
-    method,
-    headers: {
-        'Accept': 'application/json'
-    }
+const JSON_HEAD = (token) => ({
+    'Content-Type': 'application/json',
+    ...(token && TOKEN(token))
+})
+
+const MULTI_HEAD = (token) => ({
+    'Accept': 'application/json',
+    ...(token && TOKEN(token))
+})
+
+export const ajax = async (fetch, { query, variables, token }, isMulti) => {
+    return await fetch(URL, {
+        method,
+        headers: isMulti ? MULTI_HEAD(token) : JSON_HEAD(token),
+        body: JSON.stringify({ query, variables })
+    }).then(r => r.json())
 }
