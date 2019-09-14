@@ -26,7 +26,7 @@ export const regFields = [
     }
 ];
 
-export const regEl = {
+export const regElInit = {
     name: {
         value: "",
         errors: {

@@ -5,7 +5,7 @@
   import { auth, success } from "../stores/auth.js";
   import { goto } from "@sapper/app";
   import { onMount } from "svelte";
-  import { regEl, regFields } from "../data/register.js";
+  import { regElInit, regFields } from "../data/register.js";
 
   onMount(async () => {
     const isAuth = await tokenCheck();
@@ -13,11 +13,12 @@
   });
 
   let passwordCheck = true;
+  let regEl = regElInit;
 
-  const register = async e => {
+  const register = e => {
     e.preventDefault();
 
-    let values = {};
+    let variables = {};
     let error = [];
 
     // Check for empty fields
@@ -26,10 +27,12 @@
       if (regEl[key].value === "" && !regEl[key].optional) {
         regEl[key].errors.empty = true;
         error = [...error, key];
+      } else {
+        regEl[key].errors.empty = false;
       }
       // Check if field is just password confirmation
       if (key !== "confirm" && regEl[key].value.length > 0)
-        values[key] = regEl[key].value;
+        variables[key] = regEl[key].value;
     }
 
     // If empty fields found return
@@ -42,20 +45,20 @@
     if (!passwordCheck) return;
 
     // Register AJAX
-    const res = await ajax(fetch, { query, variables: values });
+    ajax(fetch, { query, variables }).then(res => {
+      // If AJAX Fail but server throw errors
+      if (res.errors) {
+        return;
+      }
 
-    // If AJAX Fail but server throw errors
-    if (res.errors) {
-      return;
-    }
-
-    // If AJAX Success
-    else if (res.data) {
-      localStorage.setItem("token", res.data.register);
-      auth.set(true);
-      success.set("Akunmu berhasil didaftarkan");
-      goto("/");
-    }
+      // If AJAX Success
+      else if (res.data) {
+        localStorage.setItem("token", res.data.register);
+        auth.set(true);
+        success.set("Akunmu berhasil didaftarkan");
+        goto("/");
+      }
+    });
   };
 </script>
 
@@ -128,7 +131,7 @@
             <input type="text" bind:value={regEl[field.bind].value} />
             {#if regEl[field.bind].errors.empty && !regEl[field.bind].optional}
               <div class="ui error message">
-                <b>{field.label} tidak boleh kosong.</b>
+                <b>Mohon lengkapi kolom {field.label}.</b>
               </div>
             {/if}
           {:else}
@@ -136,9 +139,9 @@
             {#if field.bind === 'confirm'}
               <div class="ui error message">
                 {#if !passwordCheck}
-                  <b>{field.label} tidak cocok.</b>
+                  <b>Maaf, {field.label} tidak cocok.</b>
                 {:else if regEl[field.bind].errors.empty}
-                  <b>{field.label} tidak boleh kosong.</b>
+                  <b>Mohon lengkapi kolom {field.label}.</b>
                 {/if}
               </div>
             {:else if regEl[field.bind].errors.empty}
