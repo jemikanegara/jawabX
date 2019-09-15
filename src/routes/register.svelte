@@ -125,17 +125,23 @@
 
       <!-- Input Fields -->
       {#each regFields as field}
-        <div class="field">
+        <div class="field" id={field.bind}>
           <label>{field.label}</label>
           {#if field.type === 'text'}
-            <input type="text" bind:value={regEl[field.bind].value} />
+            <input
+              type="text"
+              bind:value={regEl[field.bind].value}
+              name={field.bind} />
             {#if regEl[field.bind].errors.empty && !regEl[field.bind].optional}
               <div class="ui error message">
                 <b>Mohon lengkapi kolom {field.label}.</b>
               </div>
             {/if}
           {:else}
-            <input type="password" bind:value={regEl[field.bind].value} />
+            <input
+              type="password"
+              bind:value={regEl[field.bind].value}
+              name={field.bind} />
             {#if field.bind === 'confirm'}
               <div class="ui error message">
                 {#if !passwordCheck}
