@@ -4,11 +4,12 @@
 
   export async function preload() {
     const res = await ajax(this.fetch, { query });
+    console.log(await res);
     if (res.errors || res.data.modules.length < 1)
       this.redirect(301, "/maintenance");
 
-    const xmodules = res.data.modules;
-    return { xmodules };
+    const xmodules = await res.data.modules;
+    return await { xmodules };
   }
 </script>
 

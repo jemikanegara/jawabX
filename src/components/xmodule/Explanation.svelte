@@ -5,5 +5,5 @@
 
 <span>
   <div class="ui header">{title}</div>
-  <div class="description">{@html xmodule.description}</div>
+  <div class="description">{@html xmodule.explanation}</div>
 </span>

@@ -22,7 +22,8 @@ export const regFields = [
     {
         label: "Nomor Ponsel (Opsional)",
         type: "text",
-        bind: "phone"
+        bind: "phone",
+        optional: true
     }
 ];
 

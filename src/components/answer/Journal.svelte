@@ -1,3 +1,9 @@
+<script>
+  export let xmodule;
+
+  console.log(xmodule);
+</script>
+
 <style>
   table td {
     padding: 0 !important;
@@ -17,7 +23,7 @@
     font-family: "Lato", "Helvetica Neue", serif;
   }
   table > tr > td {
-    padding-left: 10px!important;
+    padding-left: 10px !important;
   }
 </style>
 

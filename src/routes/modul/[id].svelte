@@ -1,16 +1,30 @@
 <script context="module">
-  export async function preload({ params }) {
-    const id = params.id;
-    const res = await this.fetch("/explanation.json").then(res => res.json());
-    const xmodules = await res.modul;
+  import { ajax } from "../../graphql/settings.js";
+  import { query } from "../../graphql/queries/xmodule.js";
 
-    return { id, xmodules };
+  // export async function preload({ params }) {
+  //   const id = params.id;
+  //   const res = await this.fetch("/explanation.json").then(res => res.json());
+  //   const xmodules = await res.modul;
+
+  //   return { id, xmodules };
+  // }
+
+  export async function preload({ params }) {
+    const variables = {
+      _id: params.id
+    };
+
+    const res = await ajax(this.fetch, { query, variables });
+    const xmodules = await res.data.module;
+    console.log(xmodules);
+    return await { xmodules };
   }
 </script>
 
 <script>
-  import Explanation from "../../../components/xmodule/Explanation.svelte";
-  import Journal from "../../../components/answer/Journal.svelte";
+  import Explanation from "../../components/xmodule/Explanation.svelte";
+  import Journal from "../../components/answer/Journal.svelte";
 
   export let id;
   export let xmodules;
@@ -62,24 +76,24 @@
   <span class="prev click" on:click={prev}>
     <i class="caret square left outline icon" />
   </span>
-  <span class="text">Halaman {currentSlide + 1} / {xmodules.length}</span>
+  <span class="text">Halaman {currentSlide + 1} / {xmodules.pages.length}</span>
   <span class="next click" on:click={next}>
     <i class="caret square right outline icon" />
   </span>
 </div>
-<div class="ui header">Modul Akuntansi Dasar I : Perusahaan Jasa</div>
-<div class="author">oleh JawabX</div>
+<div class="ui header">{xmodules.title}</div>
+<div class="author">oleh {xmodules.user.name}</div>
 <div class="ui segment">
   <!-- Concept / Quiz -->
   <Explanation
-    xmodule={xmodules[currentSlide]}
-    title={xmodules[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
+    xmodule={xmodules.pages[currentSlide]}
+    title={xmodules.pages[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
 
   <!-- Example / Answer -->
-  {#if xmodules[currentSlide].example}
+  {#if xmodules.pages[currentSlide].example}
     <div class="ui header">Contoh</div>
-  {:else if xmodules[currentSlide].answer}
+  {:else if xmodules.pages[currentSlide].answer}
     <div class="ui header">Jawab</div>
   {/if}
-  <Journal xmodule={xmodules[currentSlide]} />
+  <Journal xmodule={xmodules.pages[currentSlide].answers} />
 </div>

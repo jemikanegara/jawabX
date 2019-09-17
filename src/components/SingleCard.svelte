@@ -70,7 +70,7 @@
 
 <a
   class="slide-content"
-  href="modul/jawabx/213"
+  href={`modul/${xmodule._id}`}
   rel="prefetch"
   on:mousedown={setPosition}
   on:click={stopLink}
