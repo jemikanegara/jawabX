@@ -1,7 +1,39 @@
 <script>
-  export let xmodule;
+  export let answer;
 
-  console.log(xmodule);
+  let journal = answer.journal;
+  let debitTotal = "";
+  let creditTotal = "";
+  let balance = true;
+
+  if (!journal.trueAnswer) {
+    journal.trueAnswer = {};
+
+    journal.accounts.forEach(account => {
+      journal.trueAnswer[account] = { debit: "", credit: "" };
+    });
+  }
+
+  $: (() => {
+    let calculateDebit = 0;
+    let calculateCredit = 0;
+    for (let key in journal.trueAnswer) {
+      const debit = journal.trueAnswer[key].debit;
+      const credit = journal.trueAnswer[key].credit;
+
+      calculateDebit =
+        typeof debit === "number" ? calculateDebit + debit : calculateDebit;
+      calculateCredit =
+        typeof credit === "number" ? calculateCredit + credit : calculateCredit;
+    }
+    debitTotal = calculateDebit === 0 ? "" : calculateDebit;
+    creditTotal = calculateCredit === 0 ? "" : calculateCredit;
+  })();
+
+  const checkTotal = () => {
+    if (debitTotal !== creditTotal) balance = false;
+    else balance = true;
+  };
 </script>
 
 <style>
@@ -12,8 +44,7 @@
   table th {
     width: 33.33%;
   }
-  table input,
-  table select {
+  table input {
     background: none;
     width: 100%;
     height: 100%;
@@ -36,27 +67,38 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td data-label="Nama Akun">
-        <select>
-          <option value="Biaya">Kas</option>
-          <option value="Biaya">Biaya</option>
-          <option value="Biaya">Modal</option>
-        </select>
-      </td>
-      <td data-label="Debit">
-        <input type="number" />
-      </td>
-      <td data-label="Kredit">
-        <input type="number" />
-      </td>
-    </tr>
+    {#each journal.accounts as account}
+      <tr>
+        <td data-label="Nama Akun">{account}</td>
+        <td data-label="Debit">
+          <input
+            type="number"
+            bind:value={journal.trueAnswer[account].debit}
+            on:blur={checkTotal}
+            min="0" />
+        </td>
+        <td data-label="Kredit">
+          <input
+            type="number"
+            bind:value={journal.trueAnswer[account].credit}
+            on:blur={checkTotal}
+            min="0" />
+        </td>
+      </tr>
+    {/each}
   </tbody>
   <tr>
     <td>
-      <strong>Total</strong>
+      <strong>
+        Total
+        <span>(Saldo Tidak Balance)</span>
+      </strong>
     </td>
-    <td />
-    <td />
+    <td>
+      <strong>{debitTotal}</strong>
+    </td>
+    <td>
+      <strong>{creditTotal}</strong>
+    </td>
   </tr>
 </table>

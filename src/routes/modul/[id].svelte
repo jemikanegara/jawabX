@@ -2,23 +2,14 @@
   import { ajax } from "../../graphql/settings.js";
   import { query } from "../../graphql/queries/xmodule.js";
 
-  // export async function preload({ params }) {
-  //   const id = params.id;
-  //   const res = await this.fetch("/explanation.json").then(res => res.json());
-  //   const xmodules = await res.modul;
-
-  //   return { id, xmodules };
-  // }
-
   export async function preload({ params }) {
     const variables = {
       _id: params.id
     };
 
     const res = await ajax(this.fetch, { query, variables });
-    const xmodules = await res.data.module;
-    console.log(xmodules);
-    return await { xmodules };
+    const xmodules = !res.data || res.data.errors ? null : res.data.module;
+    return { xmodules };
   }
 </script>
 
@@ -26,7 +17,6 @@
   import Explanation from "../../components/xmodule/Explanation.svelte";
   import Journal from "../../components/answer/Journal.svelte";
 
-  export let id;
   export let xmodules;
 
   let thisInstance;
@@ -72,28 +62,47 @@
   }
 </style>
 
-<div class="buttons">
-  <span class="prev click" on:click={prev}>
-    <i class="caret square left outline icon" />
-  </span>
-  <span class="text">Halaman {currentSlide + 1} / {xmodules.pages.length}</span>
-  <span class="next click" on:click={next}>
-    <i class="caret square right outline icon" />
-  </span>
-</div>
-<div class="ui header">{xmodules.title}</div>
-<div class="author">oleh {xmodules.user.name}</div>
-<div class="ui segment">
-  <!-- Concept / Quiz -->
-  <Explanation
-    xmodule={xmodules.pages[currentSlide]}
-    title={xmodules.pages[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
+{#if !xmodules}
+  <div>Sorry, Modules Not Found</div>
+{:else}
+  <div class="buttons">
+    <span class="prev click" on:click={prev}>
+      <i class="caret square left outline icon" />
+    </span>
+    <span class="text">
+      Halaman {currentSlide + 1} / {xmodules.pages.length}
+    </span>
+    <span class="next click" on:click={next}>
+      <i class="caret square right outline icon" />
+    </span>
+  </div>
+  <div class="ui header">{xmodules.title}</div>
+  <div class="author">oleh {xmodules.user.name}</div>
+  <div class="ui segment">
+    <!-- Concept / Quiz -->
+    <Explanation
+      xmodule={xmodules.pages[currentSlide]}
+      title={xmodules.pages[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
 
-  <!-- Example / Answer -->
-  {#if xmodules.pages[currentSlide].example}
-    <div class="ui header">Contoh</div>
-  {:else if xmodules.pages[currentSlide].answer}
-    <div class="ui header">Jawab</div>
-  {/if}
-  <Journal xmodule={xmodules.pages[currentSlide].answers} />
-</div>
+    <!-- Example / Answer -->
+    {#if xmodules.pages[currentSlide].type === 'CONCEPT'}
+      <div class="ui header">Contoh</div>
+    {:else if xmodules.pages[currentSlide].type === 'PRACTICE'}
+      <div class="ui header">Jawab</div>
+    {/if}
+
+    <!-- Iterate Answers -->
+    {#each xmodules.pages[currentSlide].answers as answer}
+      {#if answer.journal}
+        <Journal {answer} />
+      {:else if answer.single}
+        <div>Single Choice (Radio Button)</div>
+      {:else if answer.multi}
+        <div>Checkbox</div>
+      {:else}
+        <div>Words</div>
+      {/if}
+    {/each}
+
+  </div>
+{/if}

@@ -10,8 +10,16 @@ export const query = `query ($_id: ID!) {
       type
       answers{
         _id
-        type
-        answer
+        journal{
+          accounts
+        }
+        multi{
+          options
+        }
+        single{
+          options
+        }
+        word
       }
     }
     user{
