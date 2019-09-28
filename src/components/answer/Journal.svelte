@@ -1,19 +1,36 @@
 <script>
   export let answer;
+  import { beforeUpdate } from "svelte";
 
   let journal = answer.journal;
-  let debitTotal = "";
-  let creditTotal = "";
+  let trueAnswer = {};
+  let total = {
+    debit: 0,
+    credit: 0
+  };
   let balance = true;
 
-  if (!journal.trueAnswer) {
-    journal.trueAnswer = {};
+  // Reactivity for Total Thousand Separator
+  $: debitTotal = total.debit
+    ? total.debit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    : "";
+  $: creditTotal = total.credit
+    ? total.credit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    : "";
 
-    journal.accounts.forEach(account => {
-      journal.trueAnswer[account] = { debit: "", credit: "" };
-    });
-  }
+  // Mock Up Answer
+  beforeUpdate(() => {
+    if (!journal.trueAnswer) {
+      journal.trueAnswer = {};
 
+      journal.accounts.forEach(account => {
+        trueAnswer[account] = { debit: "", credit: "" };
+        journal.trueAnswer[account] = { debit: 0, credit: 0 };
+      });
+    }
+  });
+
+  // Reactivity For Total Value
   $: (() => {
     let calculateDebit = 0;
     let calculateCredit = 0;
@@ -26,13 +43,35 @@
       calculateCredit =
         typeof credit === "number" ? calculateCredit + credit : calculateCredit;
     }
-    debitTotal = calculateDebit === 0 ? "" : calculateDebit;
-    creditTotal = calculateCredit === 0 ? "" : calculateCredit;
+
+    const calculated = {
+      debit: calculateDebit === 0 ? "" : calculateDebit,
+      credit: calculateCredit === 0 ? "" : calculateCredit
+    };
+
+    total = calculated;
   })();
 
-  const checkTotal = () => {
-    if (debitTotal !== creditTotal) balance = false;
+  // Check for total balance
+  const balanceCheck = () => {
+    const { debit, credit } = total;
+    if (debit !== credit) balance = false;
     else balance = true;
+  };
+
+  // Update value with thousand separator
+  const updateValue = e => {
+    const field = e.target.dataset.field;
+    const account = e.target.dataset.account;
+
+    if (e.target.value) {
+      const value = e.target.value.replace(/,/g, "");
+      trueAnswer[account][field] = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      journal.trueAnswer[account][field] = +value;
+    } else {
+      journal.trueAnswer[account][field] = 0;
+      trueAnswer[account][field] = "";
+    }
   };
 </script>
 
@@ -40,7 +79,6 @@
   table td {
     padding: 0 !important;
   }
-
   table th {
     width: 33.33%;
   }
@@ -50,11 +88,28 @@
     height: 100%;
     border: none;
     outline: none;
-    padding-left: 10px;
     font-family: "Lato", "Helvetica Neue", serif;
+    letter-spacing: 0.5px;
   }
-  table > tr > td {
+  table tr > td {
     padding-left: 10px !important;
+    text-transform: capitalize;
+  }
+  .not-balance {
+    color: #db2828;
+  }
+  .balance {
+    color: #1ebc30;
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  .total-row {
+    background: #eff0f1;
+  }
+  .total-row td:not(:first-child) {
+    letter-spacing: 0.5px;
   }
 </style>
 
@@ -69,29 +124,37 @@
   <tbody>
     {#each journal.accounts as account}
       <tr>
-        <td data-label="Nama Akun">{account}</td>
+        <td data-label="Nama Akun" class="account">{account}</td>
         <td data-label="Debit">
           <input
-            type="number"
-            bind:value={journal.trueAnswer[account].debit}
-            on:blur={checkTotal}
-            min="0" />
+            type="text"
+            data-field="debit"
+            data-account={account}
+            bind:value={trueAnswer[account].debit}
+            on:blur={balanceCheck}
+            on:keyup={updateValue} />
         </td>
         <td data-label="Kredit">
           <input
-            type="number"
-            bind:value={journal.trueAnswer[account].credit}
-            on:blur={checkTotal}
-            min="0" />
+            type="text"
+            data-field="credit"
+            data-account={account}
+            bind:value={trueAnswer[account].credit}
+            on:blur={balanceCheck}
+            on:keyup={updateValue} />
         </td>
       </tr>
     {/each}
   </tbody>
-  <tr>
+  <tr class="total-row">
     <td>
       <strong>
         Total
-        <span>(Saldo Tidak Balance)</span>
+        {#if !balance}
+          <span class="not-balance">(Saldo Tidak Balance)</span>
+        {:else if balance && debitTotal && creditTotal}
+          <span class="balance">(Saldo Balance)</span>
+        {/if}
       </strong>
     </td>
     <td>
