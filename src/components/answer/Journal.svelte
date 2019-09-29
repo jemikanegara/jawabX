@@ -1,6 +1,12 @@
 <script>
+  import { ajax } from "../../graphql/settings";
+  import { query } from "../../graphql/queries/journal";
+
   export let answer;
-  export let type; // CONCEPT or PRACTICE
+  export let showAnswer; // CONCEPT or PRACTICE
+
+  const thousandRegex = /\B(?=(\d{3})+(?!\d))/g;
+  const toNumberRegex = /,/g;
 
   let journal = answer.journal;
   let trueAnswer = {};
@@ -9,13 +15,14 @@
     credit: 0
   };
   let balance = true;
+  let solutionError = false;
 
   // Reactivity for Total Thousand Separator
   $: debitTotal = total.debit
-    ? total.debit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    ? total.debit.toString().replace(thousandRegex, ",")
     : "";
   $: creditTotal = total.credit
-    ? total.credit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    ? total.credit.toString().replace(thousandRegex, ",")
     : "";
 
   // Mock Up Answer
@@ -61,18 +68,43 @@
     const account = e.target.dataset.account;
 
     if (e.target.value) {
-      const value = new String(e.target.value.replace(/,/g, ""));
+      const value = new String(e.target.value.replace(toNumberRegex, ""));
       const valueToNumber = +value;
 
       trueAnswer[account][field] = valueToNumber
-        ? value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-        : value.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        ? valueToNumber.toString().replace(thousandRegex, ",")
+        : value.slice(0, -1).replace(thousandRegex, ",");
       journal.trueAnswer[account][field] = valueToNumber
         ? valueToNumber
         : journal.trueAnswer[account][field];
     } else {
       journal.trueAnswer[account][field] = 0;
       trueAnswer[account][field] = "";
+    }
+  };
+
+  const getSolution = async e => {
+    e.target.disabled = true;
+    const variables = { _id: answer._id };
+    const token = localStorage.getItem("token");
+    const res = await ajax(fetch, { query, variables, token });
+    if (res.data.errors) {
+      solutionError = true;
+      return;
+    }
+    const solution = res.data.solution.journal.trueAnswer;
+    journal.trueAnswer = solution;
+
+    for (let key in trueAnswer) {
+      if (key !== "_id") {
+        for (let subKey in trueAnswer[key]) {
+          trueAnswer[key][subKey] = solution[key][subKey]
+            .toString()
+            .replace(thousandRegex, ",");
+
+          if (solution[key][subKey] === 0) trueAnswer[key][subKey] = "";
+        }
+      }
     }
   };
 </script>
@@ -116,6 +148,9 @@
   .buttons {
     display: flex;
   }
+  input:focus::placeholder {
+    color: transparent;
+  }
 </style>
 
 <table class="ui unstackable celled table">
@@ -129,27 +164,26 @@
   <tbody>
     {#each journal.accounts as account}
       <tr>
-        <td data-label="Nama Akun" class="account">{account}</td>
-        <td data-label="Debit">
-          <input
-            type="text"
-            data-field="debit"
-            data-account={account}
-            bind:value={trueAnswer[account].debit}
-            on:blur={balanceCheck}
-            on:keyup={updateValue}
-            pattern="[0-9]" />
-        </td>
-        <td data-label="Kredit">
-          <input
-            type="text"
-            data-field="credit"
-            data-account={account}
-            bind:value={trueAnswer[account].credit}
-            on:blur={balanceCheck}
-            on:keyup={updateValue}
-            pattern="[0-9]" />
-        </td>
+        <td class="account">{account}</td>
+        {#if !showAnswer}
+          {#each Object.entries(trueAnswer[account]) as [position, amount]}
+            <td>
+              <input
+                type="text"
+                data-field={position}
+                data-account={account}
+                bind:value={trueAnswer[account][position]}
+                on:blur={balanceCheck}
+                on:keyup={updateValue}
+                pattern="[0-9]"
+                placeholder="-" />
+            </td>
+          {/each}
+        {:else}
+          {#each Object.entries(trueAnswer[account]) as [position, amount]}
+            <td>{trueAnswer[account][position]}</td>
+          {/each}
+        {/if}
       </tr>
     {/each}
   </tbody>
@@ -174,6 +208,10 @@
 </table>
 
 <div class="buttons">
-  <button class="ui submit button fluid">Nyontek Solusi</button>
+  {#if !showAnswer}
+    <button class="ui submit button fluid" on:click={getSolution}>
+      Nyontek Solusi
+    </button>
+  {/if}
   <button class="ui blue submit button fluid">Jawab</button>
 </div>
