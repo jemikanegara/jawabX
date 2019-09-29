@@ -1,6 +1,6 @@
 <script>
   export let answer;
-  import { beforeUpdate } from "svelte";
+  export let type; // CONCEPT or PRACTICE
 
   let journal = answer.journal;
   let trueAnswer = {};
@@ -19,15 +19,11 @@
     : "";
 
   // Mock Up Answer
-  beforeUpdate(() => {
-    if (!journal.trueAnswer) {
-      journal.trueAnswer = {};
+  journal.trueAnswer = {};
 
-      journal.accounts.forEach(account => {
-        trueAnswer[account] = { debit: "", credit: "" };
-        journal.trueAnswer[account] = { debit: 0, credit: 0 };
-      });
-    }
+  journal.accounts.forEach(account => {
+    trueAnswer[account] = { debit: "", credit: "" };
+    journal.trueAnswer[account] = { debit: 0, credit: 0 };
   });
 
   // Reactivity For Total Value
@@ -65,9 +61,15 @@
     const account = e.target.dataset.account;
 
     if (e.target.value) {
-      const value = e.target.value.replace(/,/g, "");
-      trueAnswer[account][field] = value.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      journal.trueAnswer[account][field] = +value;
+      const value = new String(e.target.value.replace(/,/g, ""));
+      const valueToNumber = +value;
+
+      trueAnswer[account][field] = valueToNumber
+        ? value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        : value.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      journal.trueAnswer[account][field] = valueToNumber
+        ? valueToNumber
+        : journal.trueAnswer[account][field];
     } else {
       journal.trueAnswer[account][field] = 0;
       trueAnswer[account][field] = "";
@@ -111,6 +113,9 @@
   .total-row td:not(:first-child) {
     letter-spacing: 0.5px;
   }
+  .buttons {
+    display: flex;
+  }
 </style>
 
 <table class="ui unstackable celled table">
@@ -132,7 +137,8 @@
             data-account={account}
             bind:value={trueAnswer[account].debit}
             on:blur={balanceCheck}
-            on:keyup={updateValue} />
+            on:keyup={updateValue}
+            pattern="[0-9]" />
         </td>
         <td data-label="Kredit">
           <input
@@ -141,7 +147,8 @@
             data-account={account}
             bind:value={trueAnswer[account].credit}
             on:blur={balanceCheck}
-            on:keyup={updateValue} />
+            on:keyup={updateValue}
+            pattern="[0-9]" />
         </td>
       </tr>
     {/each}
@@ -165,3 +172,8 @@
     </td>
   </tr>
 </table>
+
+<div class="buttons">
+  <button class="ui submit button fluid">Nyontek Solusi</button>
+  <button class="ui blue submit button fluid">Jawab</button>
+</div>

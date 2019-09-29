@@ -94,7 +94,7 @@
     <!-- Iterate Answers -->
     {#each xmodules.pages[currentSlide].answers as answer}
       {#if answer.journal}
-        <Journal {answer} />
+        <Journal {answer} type={xmodules.pages[currentSlide].type}/>
       {:else if answer.single}
         <div>Single Choice (Radio Button)</div>
       {:else if answer.multi}
