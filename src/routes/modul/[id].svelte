@@ -21,13 +21,15 @@
 
   let thisInstance;
   let currentSlide = 0;
+  let isFinish = false;
 
   const prev = () => {
     if (currentSlide > 0) currentSlide--;
   };
 
   const next = () => {
-    if (currentSlide < xmodules.length - 1) currentSlide++;
+    if (currentSlide < xmodules.pages.length - 1) currentSlide++;
+    if (currentSlide === xmodules.pages.length - 1) isFinish = true;
   };
 </script>
 
@@ -63,7 +65,11 @@
 </style>
 
 {#if !xmodules}
-  <div>Sorry, Modules Not Found</div>
+  <div>
+    Maaf, Modul Tidak Ditemukan. Coba cari modul melalui fitur pencarian.
+  </div>
+{:else if isFinish}
+  <div>Selamat, kamu telah berhasil menyelesaikan modul {xmodules.title}</div>
 {:else}
   <div class="buttons">
     <span class="prev click" on:click={prev}>
@@ -96,7 +102,8 @@
       {#if answer.journal}
         <Journal
           {answer}
-          showAnswer={xmodules.pages[currentSlide].type === 'CONCEPT' ? true : false} />
+          showAnswer={xmodules.pages[currentSlide].type === 'CONCEPT' ? true : false}
+          on:next={next} />
       {:else if answer.single}
         <div>Single Choice (Radio Button)</div>
       {:else if answer.multi}

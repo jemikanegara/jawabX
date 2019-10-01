@@ -1,12 +1,16 @@
 <script>
   import { ajax } from "../../graphql/settings";
   import { query } from "../../graphql/queries/journal";
+  import { createEventDispatcher } from "svelte";
 
   export let answer;
   export let showAnswer; // CONCEPT or PRACTICE
 
+  const dispatch = createEventDispatcher();
   const thousandRegex = /\B(?=(\d{3})+(?!\d))/g;
   const toNumberRegex = /,/g;
+  let submitButton;
+  let cheatButton;
 
   let journal = answer.journal;
   let trueAnswer = {};
@@ -16,6 +20,7 @@
   };
   let balance = true;
   let solutionError = false;
+  let isCorrect;
 
   // Reactivity for Total Thousand Separator
   $: debitTotal = total.debit
@@ -83,17 +88,25 @@
     }
   };
 
-  const getSolution = async e => {
-    e.target.disabled = true;
+  const getSolution = async () => {
     const variables = { _id: answer._id };
     const token = localStorage.getItem("token");
     const res = await ajax(fetch, { query, variables, token });
     if (res.data.errors) {
       solutionError = true;
-      return;
+      return null;
     }
+    return res;
+  };
+
+  const cheatSolution = async e => {
+    e.target.disabled = true;
+    const res = await getSolution();
+    if (!res) return;
     const solution = res.data.solution.journal.trueAnswer;
     journal.trueAnswer = solution;
+    submitButton.disabled = true;
+    isCorrect = true;
 
     for (let key in trueAnswer) {
       if (key !== "_id") {
@@ -106,6 +119,31 @@
         }
       }
     }
+  };
+
+  const checkSolution = async e => {
+    const res = await getSolution(e);
+    const correctAnswer = res.data.solution.journal.trueAnswer;
+
+    let isCorrectAnswer = false;
+
+    for (let key in journal.trueAnswer) {
+      if (
+        journal.trueAnswer[key].debit === correctAnswer[key].debit &&
+        journal.trueAnswer[key].credit === correctAnswer[key].credit
+      ) {
+        isCorrectAnswer = true;
+      } else {
+        isCorrectAnswer = false;
+      }
+    }
+
+    if (isCorrectAnswer) isCorrect = true;
+    else isCorrect = false;
+  };
+
+  const next = () => {
+    dispatch("next");
   };
 </script>
 
@@ -150,6 +188,21 @@
   }
   input:focus::placeholder {
     color: transparent;
+  }
+  .response {
+    padding-bottom: 15px;
+  }
+  .check-state {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (max-width: 500px) {
+    .balance,
+    .not-balance {
+      display: block;
+    }
   }
 </style>
 
@@ -207,11 +260,43 @@
   </tr>
 </table>
 
-<div class="buttons">
-  {#if !showAnswer}
-    <button class="ui submit button fluid" on:click={getSolution}>
-      Nyontek Solusi
+{#if !showAnswer && isCorrect !== undefined}
+  <div class="response">
+    {#if isCorrect}
+      <div class="ui green message check-state">
+        Jawaban Benar
+        <button class="ui yellow submit button" on:click={next}>Lanjut</button>
+      </div>
+    {:else}
+      <div class="ui red message check-state">
+        Jawaban Salah
+        <button
+          class="ui green submit button"
+          on:click={() => {
+            isCorrect = undefined;
+          }}>
+          Coba Lagi
+        </button>
+      </div>
+    {/if}
+  </div>
+{/if}
+
+{#if isCorrect === undefined}
+  <div class="buttons">
+    {#if !showAnswer}
+      <button
+        class="ui submit button fluid"
+        on:click={cheatSolution}
+        bind:this={cheatButton}>
+        Nyontek Solusi
+      </button>
+    {/if}
+    <button
+      class="ui blue submit button fluid"
+      bind:this={submitButton}
+      on:click={checkSolution}>
+      Jawab
     </button>
-  {/if}
-  <button class="ui blue submit button fluid">Jawab</button>
-</div>
+  </div>
+{/if}
