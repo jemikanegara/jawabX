@@ -144,6 +144,7 @@
 
   const next = () => {
     dispatch("next");
+    isCorrect = undefined;
   };
 </script>
 

@@ -29,7 +29,11 @@
 
   const next = () => {
     if (currentSlide < xmodules.pages.length - 1) currentSlide++;
-    if (currentSlide === xmodules.pages.length - 1) isFinish = true;
+  };
+
+  const nextCorrect = () => {
+    next();
+    if (currentSlide === xmodules.pages.length) isFinish = true;
   };
 </script>
 
@@ -103,7 +107,7 @@
         <Journal
           {answer}
           showAnswer={xmodules.pages[currentSlide].type === 'CONCEPT' ? true : false}
-          on:next={next} />
+          on:next={nextCorrect} />
       {:else if answer.single}
         <div>Single Choice (Radio Button)</div>
       {:else if answer.multi}
