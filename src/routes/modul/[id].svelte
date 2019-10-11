@@ -15,7 +15,8 @@
 
 <script>
   import Explanation from "../../components/xmodule/Explanation.svelte";
-  import Journal from "../../components/answer/Journal.svelte";
+  import PageButton from "../../components/xmodule/PageButton.svelte";
+  import Answer from "../../components/xmodule/Answer.svelte";
 
   export let xmodules;
 
@@ -41,81 +42,42 @@
   *:not(.header) {
     line-height: 2em !important;
   }
-  i {
-    font-size: 20px;
-    &:hover {
-      color: #2185d0;
-    }
-  }
-  .click {
-    cursor: pointer;
-  }
-  .buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #eee;
-    padding: 0 10px;
-
-    & .text {
-      line-height: 1em !important;
-      font-size: 16px;
-      font-weight: bold;
-    }
-  }
   .author {
     color: #666;
   }
 </style>
 
 {#if !xmodules}
+  <!-- Not Found -->
   <div>
     Maaf, Modul Tidak Ditemukan. Coba cari modul melalui fitur pencarian.
   </div>
 {:else if isFinish}
+  <!-- Finish -->
   <div>Selamat, kamu telah berhasil menyelesaikan modul {xmodules.title}</div>
 {:else}
-  <div class="buttons">
-    <span class="prev click" on:click={prev}>
-      <i class="caret square left outline icon" />
-    </span>
-    <span class="text">
-      Halaman {currentSlide + 1} / {xmodules.pages.length}
-    </span>
-    <span class="next click" on:click={next}>
-      <i class="caret square right outline icon" />
-    </span>
-  </div>
+
+  <!-- Switch Page -->
+  <PageButton on:prev={prev} on:next={next} {currentSlide} {xmodules} />
+
+  <!-- Module Info -->
   <div class="ui header">{xmodules.title}</div>
   <div class="author">oleh {xmodules.user.name}</div>
+
+  <!-- Module Content -->
   <div class="ui segment">
-    <!-- Concept / Quiz -->
+
+    <!-- Explanation -->
     <Explanation
       xmodule={xmodules.pages[currentSlide]}
-      title={xmodules.pages[currentSlide].type === 'quiz' ? 'Kuis' : 'Konsep'} />
+      title={xmodules.pages[currentSlide].type === 'CONCEPT' ? 'Penjelasan' : 'Latihan'} />
 
-    <!-- Example / Answer -->
-    {#if xmodules.pages[currentSlide].type === 'CONCEPT'}
-      <div class="ui header">Contoh</div>
-    {:else if xmodules.pages[currentSlide].type === 'PRACTICE'}
-      <div class="ui header">Jawab</div>
-    {/if}
-
-    <!-- Iterate Answers -->
-    {#each xmodules.pages[currentSlide].answers as answer}
-      {#if answer.journal}
-        <Journal
-          {answer}
-          showAnswer={xmodules.pages[currentSlide].type === 'CONCEPT' ? true : false}
-          on:next={nextCorrect} />
-      {:else if answer.single}
-        <div>Single Choice (Radio Button)</div>
-      {:else if answer.multi}
-        <div>Checkbox</div>
-      {:else}
-        <div>Words</div>
-      {/if}
-    {/each}
+    <!-- Answers -->
+    <Answer
+      on:next={nextCorrect}
+      {xmodules}
+      {currentSlide}
+      title={xmodules.pages[currentSlide].type === 'CONCEPT' ? 'Contoh' : 'Jawab'} />
 
   </div>
 {/if}
