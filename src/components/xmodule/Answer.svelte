@@ -2,8 +2,11 @@
   export let xmodules;
   export let currentSlide;
   export let title;
+  export let pageType;
 
-  import Journal from "../answer/Journal.svelte";
+  import Journal from "./answer/Journal.svelte";
+
+  $: showAnswer = pageType === "CONCEPT" ? true : false;
 </script>
 
 <!-- Iterate Answers -->
@@ -11,10 +14,7 @@
 
 {#each xmodules.pages[currentSlide].answers as answer}
   {#if answer.journal}
-    <Journal
-      {answer}
-      showAnswer={xmodules.pages[currentSlide].type === 'CONCEPT' ? true : false}
-      on:next />
+    <Journal {answer} {showAnswer} on:next />
   {:else if answer.single}
     <div>Single Choice (Radio Button)</div>
   {:else if answer.multi}

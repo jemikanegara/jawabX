@@ -77,7 +77,8 @@
       on:next={nextCorrect}
       {xmodules}
       {currentSlide}
-      title={xmodules.pages[currentSlide].type === 'CONCEPT' ? 'Contoh' : 'Jawab'} />
+      title={xmodules.pages[currentSlide].type === 'CONCEPT' ? 'Contoh' : 'Jawab'}
+      bind:pageType={xmodules.pages[currentSlide].type} />
 
   </div>
 {/if}
