@@ -5,7 +5,6 @@
   export let pageType;
 
   import Journal from "./answer/Journal.svelte";
-
   $: showAnswer = pageType === "CONCEPT" ? true : false;
 </script>
 
@@ -14,7 +13,7 @@
 
 {#each xmodules.pages[currentSlide].answers as answer}
   {#if answer.journal}
-    <Journal {answer} {showAnswer} on:next />
+    <Journal {answer} bind:showAnswer on:next />
   {:else if answer.single}
     <div>Single Choice (Radio Button)</div>
   {:else if answer.multi}

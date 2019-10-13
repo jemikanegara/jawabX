@@ -24,6 +24,8 @@
   let currentSlide = 0;
   let isFinish = false;
 
+  $: pageType = xmodules.pages[currentSlide].type;
+
   const prev = () => {
     if (currentSlide > 0) currentSlide--;
   };
@@ -35,6 +37,7 @@
   const nextCorrect = () => {
     next();
     if (currentSlide === xmodules.pages.length) isFinish = true;
+    console.log(pageType);
   };
 </script>
 
@@ -78,7 +81,7 @@
       {xmodules}
       {currentSlide}
       title={xmodules.pages[currentSlide].type === 'CONCEPT' ? 'Contoh' : 'Jawab'}
-      bind:pageType={xmodules.pages[currentSlide].type} />
+      bind:pageType />
 
   </div>
 {/if}

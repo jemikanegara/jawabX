@@ -34,6 +34,7 @@
 
   // Initialize
   const initialize = () => {
+    console.log(showAnswer);
     trueAnswer = {};
     total = {
       debit: 0,
@@ -46,14 +47,18 @@
     // Mock Up Answer
     journal.trueAnswer = {};
 
-    if (!showAnswer) {
-      journal.accounts.forEach(account => {
-        trueAnswer[account] = { debit: "", credit: "" };
-        journal.trueAnswer[account] = { debit: 0, credit: 0 };
-      });
-    } else {
-      cheatSolution();
-    }
+    journal.accounts.forEach(account => {
+      trueAnswer[account] = { debit: "", credit: "" };
+      journal.trueAnswer[account] = { debit: 0, credit: 0 };
+    });
+
+    const journalInit = () => {
+      if (showAnswer) {
+        cheatSolution();
+      }
+    };
+
+    setTimeout(journalInit, 1);
   };
 
   initialize();
