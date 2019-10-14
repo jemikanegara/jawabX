@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
+  import AnswerNext from "./AnswerNext.svelte";
 
   export let cheatButton;
   export let submitButton;
@@ -10,7 +11,6 @@
   const dispatchEvent = e => {
     dispatch([e.target.name], { target: e.target });
   };
-
 </script>
 
 <style>
@@ -19,17 +19,15 @@
   }
 </style>
 
-{#if isCorrect === undefined}
-  <div class="buttons">
-    {#if !showAnswer}
-      <button
-        class="ui submit button fluid"
-        name="cheatSolution"
-        bind:this={cheatButton}
-        on:click={dispatchEvent}>
-        Nyontek Solusi
-      </button>
-    {/if}
+<div class="buttons">
+  {#if isCorrect === undefined && !showAnswer}
+    <button
+      class="ui submit button fluid"
+      name="cheatSolution"
+      bind:this={cheatButton}
+      on:click={dispatchEvent}>
+      Nyontek Solusi
+    </button>
     <button
       class="ui blue submit button fluid"
       name="checkSolution"
@@ -37,5 +35,7 @@
       on:click={dispatchEvent}>
       Jawab
     </button>
-  </div>
-{/if}
+  {:else}
+    <AnswerNext on:next on:initialize {showAnswer} />
+  {/if}
+</div>

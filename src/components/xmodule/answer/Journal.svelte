@@ -2,10 +2,10 @@
   import AnswerButton from "./AnswerButton.svelte";
   import AnswerFeedback from "./AnswerFeedback.svelte";
 
-  import { ajax } from "../../../graphql/settings";
   import { query } from "../../../graphql/queries/journal";
   import { createEventDispatcher } from "svelte";
   import { thousandRegex, toNumberRegex } from "../../../data/regex";
+  import { getSolution } from "./solution.js";
 
   export let answer;
   export let showAnswer; // CONCEPT or PRACTICE
@@ -34,7 +34,6 @@
 
   // Initialize
   const initialize = () => {
-    console.log(showAnswer);
     trueAnswer = {};
     total = {
       debit: 0,
@@ -113,26 +112,17 @@
     }
   };
 
-  // AJAX to Get Solution
-  const getSolution = async () => {
-    const variables = { _id: answer._id };
-    const token = localStorage.getItem("token");
-    const res = await ajax(fetch, { query, variables, token });
-    if (res.data.errors) {
-      solutionError = true;
-      return null;
-    }
-    return res;
-  };
-
   // Get Solution By Cheating
   const cheatSolution = async e => {
-    const res = await getSolution();
+    const res = await getSolution(answer._id, query);
     if (!res) return;
     const solution = res.data.solution.journal.trueAnswer;
     journal.trueAnswer = solution;
-    submitButton.disabled = true;
-    isCorrect = true;
+    if (submitButton) submitButton.disabled = true;
+
+    if (!showAnswer) {
+      isCorrect = true;
+    }
 
     for (let key in trueAnswer) {
       if (key !== "_id") {
@@ -149,7 +139,7 @@
 
   // Compare Solution
   const checkSolution = async e => {
-    const res = await getSolution(e);
+    const res = await getSolution(answer._id, query);
     const correctAnswer = res.data.solution.journal.trueAnswer;
 
     let isCorrectAnswer = false;
@@ -274,12 +264,14 @@
 
 {#if !showAnswer && isCorrect !== undefined}
   <AnswerFeedback bind:isCorrect on:next on:initialize={initialize} />
+{:else}
+  <AnswerButton
+    bind:cheatButton
+    bind:submitButton
+    {isCorrect}
+    {showAnswer}
+    on:checkSolution={checkSolution}
+    on:cheatSolution={cheatSolution}
+    on:next
+    on:initialize={initialize} />
 {/if}
-
-<AnswerButton
-  bind:cheatButton
-  bind:submitButton
-  {isCorrect}
-  {showAnswer}
-  on:checkSolution={checkSolution}
-  on:cheatSolution={cheatSolution} />

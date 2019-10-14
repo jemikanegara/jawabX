@@ -1,13 +1,7 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import AnswerNext from "./AnswerNext.svelte";
+
   export let isCorrect;
-
-  const dispatch = createEventDispatcher();
-
-  const next = () => {
-    dispatch("next");
-    dispatch("initialize");
-  };
 </script>
 
 <style>
@@ -25,7 +19,7 @@
   {#if isCorrect}
     <div class="ui green message check-state">
       Jawaban Benar
-      <button class="ui yellow submit button" on:click={next}>Lanjut</button>
+      <AnswerNext on:next on:initialize showAnswer={false} />
     </div>
   {:else}
     <div class="ui red message check-state">
