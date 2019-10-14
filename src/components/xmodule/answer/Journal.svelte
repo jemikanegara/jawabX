@@ -1,17 +1,19 @@
 <script>
-  import { ajax } from "../../graphql/settings";
-  import { query } from "../../graphql/queries/journal";
+  import AnswerButton from "./AnswerButton.svelte";
+  import AnswerFeedback from "./AnswerFeedback.svelte";
+
+  import { query } from "../../../graphql/queries/journal";
   import { createEventDispatcher } from "svelte";
+  import { thousandRegex, toNumberRegex } from "../../../data/regex";
+  import { getSolution } from "./solution.js";
 
   export let answer;
   export let showAnswer; // CONCEPT or PRACTICE
 
   const dispatch = createEventDispatcher();
-  const thousandRegex = /\B(?=(\d{3})+(?!\d))/g;
-  const toNumberRegex = /,/g;
-  let submitButton;
-  let cheatButton;
 
+  let submitButton = "";
+  let cheatButton = "";
   let journal = answer.journal;
   let trueAnswer = {};
   let total = {
@@ -30,13 +32,35 @@
     ? total.credit.toString().replace(thousandRegex, ",")
     : "";
 
-  // Mock Up Answer
-  journal.trueAnswer = {};
+  // Initialize
+  const initialize = () => {
+    trueAnswer = {};
+    total = {
+      debit: 0,
+      credit: 0
+    };
+    balance = true;
+    solutionError = false;
+    isCorrect = undefined;
 
-  journal.accounts.forEach(account => {
-    trueAnswer[account] = { debit: "", credit: "" };
-    journal.trueAnswer[account] = { debit: 0, credit: 0 };
-  });
+    // Mock Up Answer
+    journal.trueAnswer = {};
+
+    journal.accounts.forEach(account => {
+      trueAnswer[account] = { debit: "", credit: "" };
+      journal.trueAnswer[account] = { debit: 0, credit: 0 };
+    });
+
+    const journalInit = () => {
+      if (showAnswer) {
+        cheatSolution();
+      }
+    };
+
+    setTimeout(journalInit, 1);
+  };
+
+  initialize();
 
   // Reactivity For Total Value
   $: (() => {
@@ -88,25 +112,17 @@
     }
   };
 
-  const getSolution = async () => {
-    const variables = { _id: answer._id };
-    const token = localStorage.getItem("token");
-    const res = await ajax(fetch, { query, variables, token });
-    if (res.data.errors) {
-      solutionError = true;
-      return null;
-    }
-    return res;
-  };
-
+  // Get Solution By Cheating
   const cheatSolution = async e => {
-    e.target.disabled = true;
-    const res = await getSolution();
+    const res = await getSolution(answer._id, query);
     if (!res) return;
     const solution = res.data.solution.journal.trueAnswer;
     journal.trueAnswer = solution;
-    submitButton.disabled = true;
-    isCorrect = true;
+    if (submitButton) submitButton.disabled = true;
+
+    if (!showAnswer) {
+      isCorrect = true;
+    }
 
     for (let key in trueAnswer) {
       if (key !== "_id") {
@@ -121,8 +137,9 @@
     }
   };
 
+  // Compare Solution
   const checkSolution = async e => {
-    const res = await getSolution(e);
+    const res = await getSolution(answer._id, query);
     const correctAnswer = res.data.solution.journal.trueAnswer;
 
     let isCorrectAnswer = false;
@@ -140,10 +157,6 @@
 
     if (isCorrectAnswer) isCorrect = true;
     else isCorrect = false;
-  };
-
-  const next = () => {
-    dispatch("next");
   };
 </script>
 
@@ -183,19 +196,8 @@
   .total-row td:not(:first-child) {
     letter-spacing: 0.5px;
   }
-  .buttons {
-    display: flex;
-  }
   input:focus::placeholder {
     color: transparent;
-  }
-  .response {
-    padding-bottom: 15px;
-  }
-  .check-state {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 
   @media (max-width: 500px) {
@@ -261,42 +263,15 @@
 </table>
 
 {#if !showAnswer && isCorrect !== undefined}
-  <div class="response">
-    {#if isCorrect}
-      <div class="ui green message check-state">
-        Jawaban Benar
-        <button class="ui yellow submit button" on:click={next}>Lanjut</button>
-      </div>
-    {:else}
-      <div class="ui red message check-state">
-        Jawaban Salah
-        <button
-          class="ui green submit button"
-          on:click={() => {
-            isCorrect = undefined;
-          }}>
-          Coba Lagi
-        </button>
-      </div>
-    {/if}
-  </div>
-{/if}
-
-{#if isCorrect === undefined}
-  <div class="buttons">
-    {#if !showAnswer}
-      <button
-        class="ui submit button fluid"
-        on:click={cheatSolution}
-        bind:this={cheatButton}>
-        Nyontek Solusi
-      </button>
-    {/if}
-    <button
-      class="ui blue submit button fluid"
-      bind:this={submitButton}
-      on:click={checkSolution}>
-      Jawab
-    </button>
-  </div>
+  <AnswerFeedback bind:isCorrect on:next on:initialize={initialize} />
+{:else}
+  <AnswerButton
+    bind:cheatButton
+    bind:submitButton
+    {isCorrect}
+    {showAnswer}
+    on:checkSolution={checkSolution}
+    on:cheatSolution={cheatSolution}
+    on:next
+    on:initialize={initialize} />
 {/if}
