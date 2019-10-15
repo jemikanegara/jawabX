@@ -5,21 +5,18 @@
   import AnswerFeedback from "./AnswerFeedback.svelte";
   import AnswerButton from "./AnswerButton.svelte";
   import { getSolution } from "./solution.js";
-  import { query } from "../../../graphql/queries/multi";
+  import { query } from "../../../graphql/queries/word";
 
-  const {
-    multi: { options }
-  } = answer;
+  let userAnswer;
   let isCorrect;
-  let cheatButton = "";
-  let submitButton = "";
-  let userAnswer = [];
+  let cheatButton;
+  let submitButton;
 
   const initialize = () => {
+    userAnswer = undefined;
     isCorrect = undefined;
     cheatButton = "";
     submitButton = "";
-    userAnswer = [];
   };
 
   initialize();
@@ -28,59 +25,36 @@
     const res = await getSolution(answer._id, query);
     if (!res) return;
 
-    let options = res.data.solution.multi.trueAnswer;
-    let trueAnswer = [];
-
-    for (let key in options) {
-      if (options[key]) {
-        trueAnswer.push(key);
-      }
-    }
-
+    let trueAnswer = res.data.solution.word;
     return trueAnswer;
   };
 
   const checkSolution = async () => {
     const trueAnswer = await getTrueAnswer();
 
-    if (trueAnswer.length !== userAnswer.length) {
-      isCorrect = false;
-    } else {
-      let isCorrectTemp = false;
-
-      for (let i = 0; i < trueAnswer.length; i++) {
-        if (trueAnswer[i] !== userAnswer[i]) {
-          isCorrectTemp = false;
-          break;
-        } else {
-          isCorrectTemp = true;
-        }
-      }
-
-      isCorrect = isCorrectTemp;
-    }
+    if (userAnswer.toLowerCase() === trueAnswer.toLowerCase()) isCorrect = true;
+    else isCorrect = false;
   };
 
   const cheatSolution = async () => {
     const trueAnswer = await getTrueAnswer();
+
     userAnswer = trueAnswer;
     isCorrect = true;
   };
 </script>
 
-<div class="multi-choice">
-  {#each options as option}
-    <label>
-      <input
-        type="checkbox"
-        name="multi-choice"
-        value={option}
-        bind:group={userAnswer} />
-      {option.replace(/_/g, ' ')}
-    </label>
-  {/each}
-</div>
+<style>
+  input[type="text"] {
+    width: 100%;
+    border: 1px solid #666;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+</style>
 
+<input type="text" bind:value={userAnswer} />
 {#if !showAnswer && isCorrect !== undefined}
   <AnswerFeedback bind:isCorrect on:next on:initialize={initialize} />
 {:else}

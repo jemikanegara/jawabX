@@ -6,6 +6,7 @@
   import Journal from "./answer/Journal.svelte";
   import SingleChoice from "./answer/SingleChoice.svelte";
   import MultiChoice from "./answer/MultiChoice.svelte";
+  import Word from "./answer/Word.svelte";
 
   $: showAnswer =
     xmodules.pages[currentSlide].type === "CONCEPT" ? true : false;
@@ -22,8 +23,8 @@
   {:else if answer.multi && !showAnswer}
     <div class="ui header">{title}</div>
     <MultiChoice {answer} bind:showAnswer on:next />
-  {:else if answer.word && !showAnswer}
+  {:else if !showAnswer}
     <div class="ui header">{title}</div>
-    <div>Words</div>
+    <Word {answer} bind:showAnswer on:next />
   {/if}
 {/each}
