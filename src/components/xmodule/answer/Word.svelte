@@ -11,12 +11,14 @@
   let isCorrect;
   let cheatButton;
   let submitButton;
+  let isEmpty;
 
   const initialize = () => {
     userAnswer = undefined;
     isCorrect = undefined;
     cheatButton = "";
     submitButton = "";
+    isEmpty = false;
   };
 
   initialize();
@@ -30,6 +32,10 @@
   };
 
   const checkSolution = async () => {
+    if (!userAnswer) {
+      isEmpty = true;
+      return;
+    }
     const trueAnswer = await getTrueAnswer();
 
     if (userAnswer.toLowerCase() === trueAnswer.toLowerCase()) isCorrect = true;
@@ -52,10 +58,28 @@
     padding: 10px;
     margin-bottom: 10px;
   }
+
+  div.message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 </style>
 
 <input type="text" bind:value={userAnswer} />
-{#if !showAnswer && isCorrect !== undefined}
+
+{#if isEmpty}
+  <div class="ui message red">
+    Jawaban tidak boleh kosong
+    <button
+      class="ui button green"
+      on:click={() => {
+        isEmpty = false;
+      }}>
+      Mengerti
+    </button>
+  </div>
+{:else if !showAnswer && isCorrect !== undefined}
   <AnswerFeedback bind:isCorrect on:next on:initialize={initialize} />
 {:else}
   <AnswerButton
