@@ -17,6 +17,12 @@
       segment: "modul",
       text: "Modul",
       prefetch: false
+    },
+    {
+      url: "account",
+      segment: "account",
+      text: "Pengaturan",
+      prefetch: false
     }
   ];
 
