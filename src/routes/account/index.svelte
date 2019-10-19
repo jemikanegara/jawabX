@@ -6,9 +6,8 @@
   import { query as checkQuery } from "../../graphql/queries/check.js";
   import Modal from "../../components/Modal.svelte";
 
-  export let segment;
-
   let account;
+  let password;
   let accountKeys = {
     name: {
       label: "Nama",
@@ -53,8 +52,15 @@
     }
   };
 
+  const passwordData = {
+    content: "Masukkan Password",
+    error: "Password minimal 6 karakter",
+    isError: false
+  };
+
   let token = localStorage.getItem("token");
   let showModal = false;
+  let showPasswordModal = false;
 
   const initialize = async () => {
     const res = await ajax(fetch, { query: getQuery, token });
@@ -73,7 +79,11 @@
   const modify = async (e, key) => {
     let variables = {};
     variables[key] = account[key];
+    variables.password = password;
     const res = await ajax(fetch, { query: updateQuery, variables, token });
+    console.log(res);
+    if (res.data.update) close(e, key);
+    else console.log(res);
   };
 
   const edit = (e, key) => {
@@ -84,6 +94,16 @@
   const close = (e, key) => {
     accountKeys[key].edit = false;
     showModal = false;
+  };
+
+  let timer;
+
+  const validatePassword = e => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (password.length < 6) passwordData.isError = true;
+      else passwordData.isError = false;
+    }, 1000);
   };
 
   onMount(() => {
@@ -102,6 +122,31 @@
   button {
     margin-top: 10px !important;
   }
+  .content {
+    margin-right: 10px;
+    display: inline-block;
+  }
+  .edit-link {
+    color: #2185d0;
+    cursor: pointer;
+  }
+  .edit-link:hover {
+    color: #ff5722;
+  }
+  .password {
+    margin-top: 10px;
+  }
+  .password .input {
+    width: 100%;
+  }
+  .password input,
+  .password .ui.label {
+    width: 50%;
+    max-width: 50%;
+  }
+  .password .password-label {
+    margin-bottom: 5px;
+  }
 </style>
 
 <h2>Pengaturan</h2>
@@ -113,15 +158,36 @@
         {#if accountKeys[key].edit}
           <Modal
             bind:value={account[key]}
-            show={showModal}
+            {passwordData}
+            bind:show={showModal}
+            label={accountKeys[key].label}
             bind:data={accountKeys[key].data}
             on:submit={e => modify(e, key)}
             on:keyup={e => check(e, key)}
-            on:close={e => close(e, key)} />
+            on:close={e => close(e, key)}
+            submitMessage={'Simpan'}
+            edit={true}>
+            <div class="password">
+              <div class="password-label">Masukkan Password</div>
+              <div class="ui input">
+                <input
+                  type="password"
+                  bind:value={password}
+                  on:keyup={validatePassword}
+                  autocomplete="current-password" />
+                {#if passwordData.isError}
+                  <div class="ui left pointing red basic label">
+                    {passwordData.error}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          </Modal>
         {:else if account[key]}
-          <span>{account[key]}</span>
+          <span class="content">{account[key]}</span>
           {#if key !== 'name'}
             <span
+              class="edit-link"
               on:click={e => {
                 edit(e, key);
               }}>
@@ -130,6 +196,7 @@
           {/if}
         {:else}
           <span
+            class="edit-link"
             on:click={e => {
               edit(e, key);
             }}>

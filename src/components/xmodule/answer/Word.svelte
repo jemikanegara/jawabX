@@ -51,23 +51,20 @@
 </script>
 
 <style>
-  input[type="text"] {
-    width: 100%;
-    border: 1px solid #666;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-
   div.message {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+  .input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 </style>
 
-<input type="text" bind:value={userAnswer} />
-
+<div class="ui input">
+  <input type="text" bind:value={userAnswer} />
+</div>
 {#if isEmpty}
   <div class="ui message red">
     Jawaban tidak boleh kosong

@@ -4,9 +4,15 @@
   export let show;
   export let value;
   export let data;
+  export let label;
+  export let submitMessage;
+  export let edit;
+  export let passwordData;
 
   const dispatch = createEventDispatcher();
   let timer;
+  let passwordError;
+  let passwordErrorMessage;
 
   //   let modalData = {
   //     header: "",
@@ -14,6 +20,8 @@
   //     success: "",
   //     submit: ""
   //   };
+
+  $: disabled = passwordData.isError || data.isError ? true : false;
 
   const keyup = () => {
     clearTimeout(timer);
@@ -23,6 +31,7 @@
   };
 
   const submit = () => {
+    if (disabled) return;
     dispatch("submit");
   };
 
@@ -53,6 +62,9 @@
     max-width: 50%;
     width: 50%;
   }
+  .input:last-child {
+    margin-top: 10px;
+  }
   .modal-content {
     margin-bottom: 10px;
     white-space: pre;
@@ -61,7 +73,7 @@
 
 <div class="modal-wrap" style={`display: ${show ? 'flex' : 'none'}`}>
   <div class="ui modal" style={`display: ${show ? 'block' : 'none'}`}>
-    <div class="header">{data.header}</div>
+    <div class="header">{edit ? 'Ganti ' : ''}{label}</div>
     <div class="content">
       <div class="modal-content">{data.content}</div>
       <div class="inline field">
@@ -73,16 +85,19 @@
             <div class="ui left pointing green basic label">{data.success}</div>
           {:else}
             <div class="ui left pointing yellow basic label">
-              masukkan email baru
+              Masukkan {label}
             </div>
           {/if}
         </div>
+        <slot />
       </div>
     </div>
     <div class="actions">
       <div class="ui cancel red button" on:click={close}>Batal</div>
-      <div class="ui approve button primary" on:click={submit}>
-        {data.submit}
+      <div
+        class={`ui approve button primary ${disabled ? 'disabled' : ''}`}
+        on:click={submit}>
+        {submitMessage}
       </div>
     </div>
   </div>
