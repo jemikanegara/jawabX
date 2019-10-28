@@ -39,9 +39,12 @@
   };
 
   onMount(() => {
-    token = localStorage.getItem("token");
-    fetchAccount();
-    accountEdit = Object.assign({}, account);
+    if (!$auth) window.location.href = "/";
+    else {
+      token = localStorage.getItem("token");
+      fetchAccount();
+      accountEdit = Object.assign({}, account);
+    }
   });
 </script>
 
@@ -92,50 +95,57 @@
   }
 </style>
 
-<h2>Pengaturan</h2>
-<div class="profile">
-  <div class="left">
-    <div class="image">
-      <i class="user icon" />
+{#if $auth}
+  <h2>Pengaturan</h2>
+  <div class="profile">
+    <div class="left">
+      <div class="image">
+        <i class="user icon" />
+      </div>
+      <button class="ui button primary fluid">Ubah Foto Profil</button>
     </div>
-    <button class="ui button primary fluid">Ubah Foto Profil</button>
-  </div>
-  <div class="right">
-    {#each Object.keys(account) as key}
-      <div class="data">
-        {#if accountText[key]}
-          <label>{accountText[key].label}</label>
-          {#if accountText[key].edit}
-            <AccountEdit
-              on:close={() => {
-                setMode(key, false);
-              }}
-              bind:accountEdit
-              {key}
-              {token}
-              keyInfo={accountText[key]} />
-          {:else if account[key]}
-            <span class="content">{account[key]}</span>
-            {#if key !== 'name'}
+    <div class="right">
+      {#each Object.keys(account) as key}
+        <div class="data">
+          {#if accountText[key]}
+            <label>{accountText[key].label}</label>
+            {#if accountText[key].edit}
+              <AccountEdit
+                on:close={() => {
+                  setMode(key, false);
+                }}
+                on:refresh={() => {
+                  fetchAccount();
+                }}
+                bind:accountEdit
+                {key}
+                {token}
+                keyInfo={accountText[key]} />
+            {:else if account[key]}
+              <span class="content">{account[key]}</span>
+              {#if key !== 'name'}
+                <span
+                  class="edit-link"
+                  on:click={e => {
+                    setMode(key, true);
+                  }}>
+                  Edit
+                </span>
+              {/if}
+            {:else}
               <span
                 class="edit-link"
                 on:click={e => {
                   setMode(key, true);
                 }}>
-                Edit
+                Tambah
               </span>
             {/if}
-          {:else}
-            <span
-              class="edit-link"
-              on:click={e => {
-                setMode(key, true);
-              }}>
-              Tambah
-            </span>
           {/if}
-        {/if}
-      </div>
-    {/each}
+        </div>
+      {/each}
+    </div>
   </div>
-</div>
+{:else}
+  <div>Anda belum masuk</div>
+{/if}

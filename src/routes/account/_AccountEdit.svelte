@@ -14,7 +14,7 @@
   export let accountEdit;
 
   let accountEditText = Object.assign({}, accountEditBluePrint);
-  let password = ""
+  let password = "";
   let confirmNewPassword;
   $: isNewPassword = key === "newPassword";
 
@@ -43,7 +43,8 @@
   };
 
   // Modify Single Data of Account
-  const modifyData = async () => {
+  const modifyData = async e => {
+    e.preventDefault();
     variables[key] = accountEdit[key];
     variables.password = password;
     const res = await ajax(fetch, {
@@ -51,7 +52,11 @@
       variables,
       token
     });
-    if (res.data.update) setMode(key, false);
+    if (res.data.update) {
+      dispatch("close");
+      dispatch("refresh");
+      reset();
+    }
   };
 
   // Validate Password
@@ -66,6 +71,12 @@
   // Close Modal
   const close = () => {
     dispatch("close");
+  };
+
+  // Reset All State
+  const reset = () => {
+    accountEdit[key] = "";
+    accountEditText[key].isError = undefined;
   };
 </script>
 
@@ -98,85 +109,88 @@
   }
 </style>
 
-<Modal>
-  <!-- Header -->
-  <span slot="header">{keyInfo.label}</span>
+<form on:submit={modifyData}>
+  <Modal>
+    <!-- Header -->
+    <span slot="header">{keyInfo.label}</span>
 
-  <!-- Content -->
-  <span slot="content">{accountEditText[key].content}</span>
+    <!-- Content -->
+    <span slot="content">{accountEditText[key].content}</span>
 
-  <!-- Input -->
-  <span slot="input">
-    <div class="ui input">
-
-      <!-- Input Field -->
-      {#if isNewPassword}
-        <input
-          type="password"
-          bind:value={accountEdit[key]}
-          on:keyup={checkData} />
-      {:else}
-        <input type="text" bind:value={accountEdit[key]} on:keyup={checkData} />
-      {/if}
-
-      <!-- Input Feedback -->
-      {#if accountEditText[key].isError}
-        <div class="ui left pointing red basic label">
-          {accountEditText[key].error}
-        </div>
-      {:else if accountEditText[key].isError !== undefined}
-        <div class="ui left pointing green basic label">
-          {accountEditText[key].success}
-        </div>
-      {:else}
-        <div class="ui left pointing yellow basic label">
-          Masukkan {keyInfo.label}
-        </div>
-      {/if}
-
-      <!-- New Password -->
-      {#if key === 'newPassword'}
-        <div class="password">
-          <div class="password-label">Ulangi Kata Sandi Baru</div>
-          <div class="ui input">
-            <input
-              type="password"
-              bind:value={confirmNewPassword}
-              on:keyup={validatePassword} />
-            {#if accountEditText.confirmNewPasswordText.isError}
-              <div class="ui left pointing red basic label">
-                {accountEditText.confirmNewPasswordText.error}
-              </div>
-            {/if}
-          </div>
-        </div>
-      {/if}
-    </div>
-
-    <!-- Password -->
-    <div class="password">
-      <div class="password-label">Kata Sandi Aktif</div>
+    <!-- Input -->
+    <span slot="input">
       <div class="ui input">
-        <input
-          type="password"
-          bind:value={password}
-          on:keyup={validatePassword} />
-        {#if accountEditText.password.isError}
+
+        <!-- Input Field -->
+        {#if isNewPassword}
+          <input
+            type="password"
+            bind:value={accountEdit[key]}
+            on:keyup={checkData} />
+        {:else}
+          <input
+            type="text"
+            bind:value={accountEdit[key]}
+            on:keyup={checkData} />
+        {/if}
+
+        <!-- Input Feedback -->
+        {#if accountEditText[key].isError}
           <div class="ui left pointing red basic label">
-            {accountEditText.password.error}
+            {accountEditText[key].error}
+          </div>
+        {:else if accountEditText[key].isError !== undefined}
+          <div class="ui left pointing green basic label">
+            {accountEditText[key].success}
+          </div>
+        {:else}
+          <div class="ui left pointing yellow basic label">
+            Masukkan {keyInfo.label}
+          </div>
+        {/if}
+
+        <!-- New Password -->
+        {#if key === 'newPassword'}
+          <div class="password">
+            <div class="password-label">Ulangi Kata Sandi Baru</div>
+            <div class="ui input">
+              <input
+                type="password"
+                bind:value={confirmNewPassword}
+                on:keyup={validatePassword} />
+              {#if accountEditText.confirmNewPasswordText.isError}
+                <div class="ui left pointing red basic label">
+                  {accountEditText.confirmNewPasswordText.error}
+                </div>
+              {/if}
+            </div>
           </div>
         {/if}
       </div>
-    </div>
-  </span>
 
-  <!-- Buttons -->
-  <span slot="buttons">
-    <div class="ui cancel red button" on:click={close}>Batal</div>
-    <div
-      class={`ui approve button primary ${disabled ? 'disabled' : ''}`}
-      on:click={modifyData}>
-      Simpan
-    </div>
-  </span>
-</Modal>
+      <!-- Password -->
+      <div class="password">
+        <div class="password-label">Kata Sandi Aktif</div>
+        <div class="ui input">
+          <input
+            type="password"
+            bind:value={password}
+            on:keyup={validatePassword} />
+          {#if accountEditText.password.isError}
+            <div class="ui left pointing red basic label">
+              {accountEditText.password.error}
+            </div>
+          {/if}
+        </div>
+      </div>
+    </span>
+
+    <!-- Buttons -->
+    <span slot="buttons">
+      <div class="ui cancel red button" on:click={close}>Batal</div>
+      <button class={`ui approve button primary ${disabled ? 'disabled' : ''}`}>
+        Simpan
+      </button>
+    </span>
+  </Modal>
+</form>
